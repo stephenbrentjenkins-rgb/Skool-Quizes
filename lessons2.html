@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 2 Quiz — Reading a Price Chart</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: #ffffff;
+    color: #1a1a1a;
+    padding: 32px 24px;
+    max-width: 720px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+  h2 { font-size: 20px; font-weight: 500; margin-bottom: 4px; }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 28px; }
+  .q-block { margin-bottom: 32px; }
+  .q-num { font-size: 11px; font-weight: 500; color: #999; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 6px; }
+  .q-text { font-size: 15px; font-weight: 500; color: #1a1a1a; margin-bottom: 14px; line-height: 1.5; }
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    cursor: pointer;
+    font-size: 14px;
+    color: #111111;
+    line-height: 1.5;
+    background: #fff;
+    transition: background 0.1s;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .opt:hover { background: #f5f5f5; }
+  .opt.correct { border-color: #0F6E56; background: #E1F5EE; color: #085041; }
+  .opt.wrong { border-color: #A32D2D; background: #FCEBEB; color: #501313; }
+  .opt.reveal-correct { border-color: #0F6E56; background: #E1F5EE; color: #085041; }
+  .opt-letter { font-weight: 500; min-width: 18px; flex-shrink: 0; }
+  .feedback {
+    font-size: 13px;
+    margin-top: 8px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    line-height: 1.6;
+    display: none;
+  }
+  .feedback.show { display: block; }
+  .feedback.correct { background: #E1F5EE; color: #085041; }
+  .feedback.wrong { background: #FCEBEB; color: #501313; }
+  hr { border: none; border-top: 1px solid #eeeeee; margin: 28px 0; }
+  .score-block {
+    display: none;
+    margin-top: 32px;
+    padding: 24px;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+    text-align: center;
+  }
+  .score-block.show { display: block; }
+  .score-num { font-size: 40px; font-weight: 500; margin-bottom: 8px; color: #1a1a1a; }
+  .score-label { font-size: 14px; color: #666; }
+  .reset-btn {
+    margin-top: 18px;
+    padding: 8px 22px;
+    border-radius: 8px;
+    border: 1px solid #d0d0d0;
+    background: #f5f5f5;
+    color: #1a1a1a;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: inherit;
+    transition: background 0.1s;
+  }
+  .reset-btn:hover { background: #ebebeb; }
+
+  @media (prefers-color-scheme: dark) {
+    body { background: #141414; color: #e8e6e0; }
+    .q-text { color: #e8e6e0; }
+    .opt { background: #1e1e1e; border-color: #2e2e2e; color: #e8e6e0; }
+    .opt:hover { background: #252525; }
+    .opt.correct { background: #04342C; border-color: #0F6E56; color: #9FE1CB; }
+    .opt.wrong { background: #2e1010; border-color: #A32D2D; color: #f09595; }
+    .opt.reveal-correct { background: #04342C; border-color: #0F6E56; color: #9FE1CB; }
+    .feedback.correct { background: #04342C; color: #9FE1CB; }
+    .feedback.wrong { background: #2e1010; color: #f09595; }
+    hr { border-color: #2a2a2a; }
+    .score-block { border-color: #2e2e2e; }
+    .score-num { color: #e8e6e0; }
+    .score-label { color: #888; }
+    .reset-btn { background: #1e1e1e; color: #e8e6e0; border-color: #3a3a3a; }
+    .reset-btn:hover { background: #2a2a2a; }
+    .subtitle { color: #666; }
+  }
+</style>
+</head>
+<body>
+
+<h2>Lesson 2 Knowledge Check</h2>
+<p class="subtitle">Reading a price chart — 5 questions</p>
+
+<div class="q-block" id="q1">
+  <div class="q-num">Question 1 of 5</div>
+  <div class="q-text">What four pieces of information does a single candlestick show you?</div>
+  <div class="options">
+    <div class="opt"><span class="opt-letter">A</span>Price, volume, momentum, and trend direction</div>
+    <div class="opt"><span class="opt-letter">B</span>Open, close, high, and low</div>
+    <div class="opt"><span class="opt-letter">C</span>Buy price, sell price, average price, and daily change</div>
+    <div class="opt"><span class="opt-letter">D</span>Support, resistance, breakout, and reversal levels</div>
+  </div>
+  <div class="feedback correct" id="q1-c">Correct. Every candle shows the open (where it started), close (where it ended), high (peak reached), and low (lowest point). Those four points tell the complete story of that period.</div>
+  <div class="feedback wrong" id="q1-w">Not quite. A candlestick always shows four things: open, close, high, and low. These four data points pack the full story of a time period into one shape.</div>
+</div>
+
+<hr>
+
+<div class="q-block" id="q2">
+  <div class="q-num">Question 2 of 5</div>
+  <div class="q-text">A candlestick is green. What does this tell you?</div>
+  <div class="options">
+    <div class="opt"><span class="opt-letter">A</span>The stock is a good buy right now</div>
+    <div class="opt"><span class="opt-letter">B</span>The stock closed higher than it opened — buyers were in control during that period</div>
+    <div class="opt"><span class="opt-letter">C</span>The price reached its highest point of the year</div>
+    <div class="opt"><span class="opt-letter">D</span>The stock is in a long-term uptrend</div>
+  </div>
+  <div class="feedback correct" id="q2-c">Exactly right. Green simply means the close was higher than the open. Buyers won that particular period. It doesn't tell you about the overall trend — just that one period.</div>
+  <div class="feedback wrong" id="q2-w">Green tells you only one thing: the price closed higher than it opened for that period. Buyers were in control. It says nothing about the trend, valuation, or whether it's a good trade.</div>
+</div>
+
+<hr>
+
+<div class="q-block" id="q3">
+  <div class="q-num">Question 3 of 5</div>
+  <div class="q-text">What do the thin lines (wicks) above and below a candle body represent?</div>
+  <div class="options">
+    <div class="opt"><span class="opt-letter">A</span>The trading volume for that period</div>
+    <div class="opt"><span class="opt-letter">B</span>The previous day's open and close</div>
+    <div class="opt"><span class="opt-letter">C</span>The high and low price reached during the period</div>
+    <div class="opt"><span class="opt-letter">D</span>The support and resistance levels</div>
+  </div>
+  <div class="feedback correct" id="q3-c">Correct. The wicks show the full price range — how far up price got (upper wick) and how far down it went (lower wick) before the period ended. Long wicks carry a lot of meaning.</div>
+  <div class="feedback wrong" id="q3-w">The wicks show the high and low of the period. The upper wick = the highest price reached. The lower wick = the lowest price reached. They show the extremes that the body doesn't capture.</div>
+</div>
+
+<hr>
+
+<div class="q-block" id="q4">
+  <div class="q-num">Question 4 of 5</div>
+  <div class="q-text">Why is the daily chart recommended for beginners learning support and resistance?</div>
+  <div class="options">
+    <div class="opt"><span class="opt-letter">A</span>It updates faster than other timeframes</div>
+    <div class="opt"><span class="opt-letter">B</span>It filters out short-term noise and shows the most reliable S&amp;R levels</div>
+    <div class="opt"><span class="opt-letter">C</span>It's the only chart available on free platforms</div>
+    <div class="opt"><span class="opt-letter">D</span>It shows price in real time</div>
+  </div>
+  <div class="feedback correct" id="q4-c">Spot on. The daily chart smooths out short-term noise and reveals the levels that the most traders are watching — which makes those levels more significant and more reliable.</div>
+  <div class="feedback wrong" id="q4-w">The daily chart is recommended because it filters out noisy short-term moves and shows the support and resistance levels that the most traders are watching — making them more reliable to trade.</div>
+</div>
+
+<hr>
+
+<div class="q-block" id="q5">
+  <div class="q-num">Question 5 of 5</div>
+  <div class="q-text">A stock is making higher highs and higher lows. What does this describe?</div>
+  <div class="options">
+    <div class="opt"><span class="opt-letter">A</span>A downtrend — sellers are in control</div>
+    <div class="opt"><span class="opt-letter">B</span>A sideways market — neither side is winning</div>
+    <div class="opt"><span class="opt-letter">C</span>An uptrend — buyers are in control</div>
+    <div class="opt"><span class="opt-letter">D</span>A reversal — the trend is about to change</div>
+  </div>
+  <div class="feedback correct" id="q5-c">Perfect. Higher highs and higher lows = uptrend. Buyers are pushing price to new peaks, and even the pullbacks are ending at higher levels than before. Buyers are firmly in control.</div>
+  <div class="feedback wrong" id="q5-w">Higher highs and higher lows define an uptrend. Each rally goes higher than the last, and each dip ends higher than the last. That's a market where buyers are in control.</div>
+</div>
+
+<div class="score-block" id="score">
+  <div class="score-num" id="score-num">0/5</div>
+  <div class="score-label" id="score-label"></div>
+  <button class="reset-btn" onclick="resetQuiz()">Retake quiz</button>
+</div>
+
+<script>
+  var correctIndex = { q1: 1, q2: 1, q3: 2, q4: 1, q5: 2 };
+  var answered = {};
+
+  function init() {
+    Object.keys(correctIndex).forEach(function(qid) {
+      var opts = document.querySelectorAll('#' + qid + ' .opt');
+      opts.forEach(function(opt, i) {
+        opt.addEventListener('click', function() { answer(qid, opt, i === correctIndex[qid]); });
+      });
+    });
+  }
+
+  function answer(qid, el, correct) {
+    if (answered[qid] !== undefined) return;
+    answered[qid] = correct;
+    var opts = document.querySelectorAll('#' + qid + ' .opt');
+    opts.forEach(function(o) { o.style.pointerEvents = 'none'; });
+    if (correct) {
+      el.classList.add('correct');
+      document.getElementById(qid + '-c').classList.add('show');
+    } else {
+      el.classList.add('wrong');
+      opts[correctIndex[qid]].classList.add('reveal-correct');
+      document.getElementById(qid + '-w').classList.add('show');
+    }
+    if (Object.keys(answered).length === 5) showScore();
+  }
+
+  function showScore() {
+    var score = Object.values(answered).filter(Boolean).length;
+    document.getElementById('score-num').textContent = score + '/5';
+    var labels = [
+      'Keep reviewing — rewatch the video and try again!',
+      'Good effort — check the questions you missed.',
+      'Solid grasp — you\'re ready for Lesson 3.',
+      'Great work — the concepts are sticking!',
+      'Perfect score — on to Lesson 3!'
+    ];
+    document.getElementById('score-label').textContent = labels[score];
+    document.getElementById('score').classList.add('show');
+  }
+
+  function resetQuiz() {
+    Object.keys(answered).forEach(function(k) { delete answered[k]; });
+    document.querySelectorAll('.opt').forEach(function(o) {
+      o.className = 'opt';
+      o.style.pointerEvents = '';
+    });
+    document.querySelectorAll('.feedback').forEach(function(f) { f.classList.remove('show'); });
+    document.getElementById('score').classList.remove('show');
+    init();
+  }
+
+  init();
+</script>
+</body>
+</html>

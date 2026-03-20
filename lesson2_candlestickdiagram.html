@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 2 — Candlestick Chart Diagram</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: #f9f9f7;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+  .card {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e8e8e4;
+    padding: 28px 28px 24px;
+    max-width: 720px;
+    width: 100%;
+  }
+  .lesson-tag {
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: #999;
+    margin-bottom: 6px;
+  }
+  h1 {
+    font-size: 20px;
+    font-weight: 500;
+    color: #1a1a1a;
+    margin-bottom: 4px;
+  }
+  .subtitle {
+    font-size: 13px;
+    color: #999;
+    margin-bottom: 20px;
+  }
+  .controls {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  button {
+    font-size: 13px;
+    font-family: inherit;
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1px solid #ddd;
+    background: #f5f5f3;
+    color: #444;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  button:hover { background: #ececea; border-color: #ccc; }
+  button.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+  .chart-wrap {
+    background: #fafaf8;
+    border: 1px solid #eeeeea;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  svg { display: block; width: 100%; }
+  .callout {
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: #f5f5f3;
+    border: 1px solid #e8e8e4;
+    font-size: 13px;
+    color: #555;
+    line-height: 1.7;
+    display: none;
+  }
+  .callout.show { display: block; }
+  .callout strong { color: #1a1a1a; }
+
+  @media (prefers-color-scheme: dark) {
+    body { background: #141414; }
+    .card { background: #1e1e1e; border-color: #2e2e2e; }
+    h1, .callout strong { color: #e8e6e0; }
+    .subtitle, .lesson-tag { color: #666; }
+    button { background: #2a2a2a; color: #c2c0b6; border-color: #3a3a3a; }
+    button:hover { background: #333; }
+    button.active { background: #e8e6e0; color: #1a1a1a; border-color: #e8e6e0; }
+    .chart-wrap { background: #181818; border-color: #2a2a2a; }
+    .callout { background: #252525; border-color: #333; color: #a0a09a; }
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="lesson-tag">Lesson 2 · Foundation</div>
+  <h1>Reading a candlestick chart</h1>
+  <p class="subtitle">Click each button to explore a different concept</p>
+
+  <div class="controls">
+    <button class="active" onclick="setView('anatomy', this)">Candle anatomy</button>
+    <button onclick="setView('bull', this)">Bullish candle</button>
+    <button onclick="setView('bear', this)">Bearish candle</button>
+    <button onclick="setView('series', this)">Reading a series</button>
+  </div>
+
+  <div class="chart-wrap">
+    <svg id="diagram" viewBox="0 0 660 320" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+
+  <div class="callout show" id="callout-anatomy">
+    <strong>The anatomy of a candlestick.</strong> Every candle packs four data points into one shape: open, close, high, and low. The body (thick part) shows the open-to-close range. The wicks (thin lines) show the high and low extremes reached during that period.
+  </div>
+  <div class="callout" id="callout-bull">
+    <strong>A bullish (green) candle.</strong> The close is higher than the open — buyers pushed price up during this period. The longer the body, the more convincing the move. A long upper wick means buyers tried to go higher but sellers pushed back near the top.
+  </div>
+  <div class="callout" id="callout-bear">
+    <strong>A bearish (red) candle.</strong> The close is lower than the open — sellers were in control. A long lower wick means sellers pushed price down hard, but buyers stepped back in before the close. Always read the whole candle, not just the colour.
+  </div>
+  <div class="callout" id="callout-series">
+    <strong>Reading a series of candles.</strong> A run of green candles = buyers in control (uptrend). A run of red candles = sellers in control (downtrend). Watch for where one side runs out of steam — that's often near a support or resistance level.
+  </div>
+</div>
+
+<script>
+  var GREEN = '#0F6E56';
+  var GREEN_LIGHT = '#E1F5EE';
+  var RED = '#A32D2D';
+  var RED_LIGHT = '#FCEBEB';
+
+  var darkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var TEXT = darkMode ? '#c2c0b6' : '#3d3d3a';
+  var MUTED = darkMode ? '#666' : '#aaa';
+
+  if (darkMode) {
+    GREEN_LIGHT = '#04342C';
+    RED_LIGHT = '#2e1010';
+  }
+
+  function svgEl(tag, attrs) {
+    var el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    Object.keys(attrs).forEach(function(k) { el.setAttribute(k, attrs[k]); });
+    return el;
+  }
+
+  function addText(svg, x, y, content, size, fill, anchor, weight) {
+    var el = svgEl('text', {
+      x: x, y: y,
+      'font-family': '-apple-system, BlinkMacSystemFont, sans-serif',
+      'font-size': size || 12,
+      'fill': fill || TEXT,
+      'text-anchor': anchor || 'start',
+      'font-weight': weight || 400,
+      'dominant-baseline': 'central'
+    });
+    el.textContent = content;
+    svg.appendChild(el);
+  }
+
+  function addRect(svg, x, y, w, h, fill, stroke, rx) {
+    var el = svgEl('rect', { x:x, y:y, width:w, height:h, fill:fill, stroke:stroke||'none', 'stroke-width':1.5, rx:rx||2 });
+    svg.appendChild(el);
+  }
+
+  function addLine(svg, x1, y1, x2, y2, stroke, sw) {
+    var el = svgEl('line', { x1:x1, y1:y1, x2:x2, y2:y2, stroke:stroke, 'stroke-width':sw||1.5, 'stroke-linecap':'round' });
+    svg.appendChild(el);
+  }
+
+  function addLeader(svg, x1, y1, x2, y2) {
+    addLine(svg, x1, y1, x2, y2, MUTED, 0.75);
+    var dot = svgEl('circle', { cx:x1, cy:y1, r:2.5, fill:MUTED });
+    svg.appendChild(dot);
+  }
+
+  function setView(mode, btn) {
+    document.querySelectorAll('button').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    document.querySelectorAll('.callout').forEach(function(c) { c.classList.remove('show'); });
+    document.getElementById('callout-' + mode).classList.add('show');
+
+    var svg = document.getElementById('diagram');
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+    if (mode === 'anatomy') drawAnatomy(svg);
+    if (mode === 'bull')    drawBull(svg);
+    if (mode === 'bear')    drawBear(svg);
+    if (mode === 'series')  drawSeries(svg);
+  }
+
+  function drawAnatomy(svg) {
+    var cx = 180, bw = 50;
+    var wickTop = 50, bodyTop = 100, bodyBot = 210, wickBot = 260;
+
+    addLine(svg, cx, wickTop, cx, bodyTop, TEXT, 1.5);
+    addLine(svg, cx, bodyBot, cx, wickBot, TEXT, 1.5);
+    addRect(svg, cx - bw/2, bodyTop, bw, bodyBot - bodyTop, GREEN_LIGHT, GREEN, 3);
+
+    addLeader(svg, cx, wickTop + 8, 290, 52);
+    addText(svg, 298, 52, 'High — highest point reached', 13);
+
+    addLeader(svg, cx - bw/2, bodyTop + 10, 290, 108);
+    addText(svg, 298, 108, 'Open — where price started', 13);
+
+    addLeader(svg, cx - bw/2, bodyBot - 10, 290, 202);
+    addText(svg, 298, 202, 'Close — where price ended', 13);
+
+    addLeader(svg, cx, wickBot - 8, 290, 258);
+    addText(svg, 298, 258, 'Low — lowest point reached', 13);
+
+    addText(svg, cx - bw/2 - 36, (bodyTop + bodyBot) / 2, 'Body', 11, MUTED, 'middle');
+    addText(svg, cx + bw/2 + 8, wickTop + 18, 'Wick', 11, MUTED);
+    addText(svg, cx + bw/2 + 8, wickBot - 18, 'Wick', 11, MUTED);
+  }
+
+  function drawBull(svg) {
+    var cx = 155, bw = 54;
+    var wickTop = 48, bodyTop = 98, bodyBot = 222, wickBot = 272;
+
+    addLine(svg, cx, wickTop, cx, bodyTop, GREEN, 1.5);
+    addLine(svg, cx, bodyBot, cx, wickBot, GREEN, 1.5);
+    addRect(svg, cx - bw/2, bodyTop, bw, bodyBot - bodyTop, GREEN_LIGHT, GREEN, 3);
+
+    addLeader(svg, cx - bw/2, bodyTop, 290, 78);
+    addText(svg, 298, 78, 'Close (higher than open)', 13, GREEN);
+
+    addLeader(svg, cx - bw/2, bodyBot, 290, 242);
+    addText(svg, 298, 242, 'Open (lower than close)', 13, MUTED);
+
+    addLeader(svg, cx, wickTop + 8, 290, 48);
+    addText(svg, 298, 48, 'Upper wick — reached but rejected', 13, MUTED);
+
+    addLeader(svg, cx, wickBot - 8, 290, 272);
+    addText(svg, 298, 272, 'Lower wick — dipped but recovered', 13, MUTED);
+
+    addText(svg, 330, 308, 'Price closed UP — buyers won this period', 13, GREEN, 'middle', 500);
+  }
+
+  function drawBear(svg) {
+    var cx = 155, bw = 54;
+    var wickTop = 48, bodyTop = 98, bodyBot = 222, wickBot = 272;
+
+    addLine(svg, cx, wickTop, cx, bodyTop, RED, 1.5);
+    addLine(svg, cx, bodyBot, cx, wickBot, RED, 1.5);
+    addRect(svg, cx - bw/2, bodyTop, bw, bodyBot - bodyTop, RED_LIGHT, RED, 3);
+
+    addLeader(svg, cx - bw/2, bodyTop, 290, 78);
+    addText(svg, 298, 78, 'Open (higher than close)', 13, MUTED);
+
+    addLeader(svg, cx - bw/2, bodyBot, 290, 242);
+    addText(svg, 298, 242, 'Close (lower than open)', 13, RED);
+
+    addLeader(svg, cx, wickTop + 8, 290, 48);
+    addText(svg, 298, 48, 'Upper wick — attempted rally, failed', 13, MUTED);
+
+    addLeader(svg, cx, wickBot - 8, 290, 272);
+    addText(svg, 298, 272, 'Lower wick — sellers pushed hard', 13, MUTED);
+
+    addText(svg, 330, 308, 'Price closed DOWN — sellers won this period', 13, RED, 'middle', 500);
+  }
+
+  function drawSeries(svg) {
+    var candles = [
+      { x:50,  open:230, close:195, high:178, low:248, bull:true  },
+      { x:112, open:198, close:162, high:148, low:210, bull:true  },
+      { x:174, open:165, close:132, high:118, low:178, bull:true  },
+      { x:236, open:136, close:168, high:122, low:182, bull:false },
+      { x:298, open:162, close:198, high:148, low:212, bull:true  },
+      { x:360, open:195, close:228, high:182, low:242, bull:true  },
+      { x:422, open:225, close:258, high:212, low:272, bull:true  },
+      { x:484, open:255, close:222, high:208, low:268, bull:false },
+      { x:546, open:226, close:192, high:178, low:238, bull:false },
+      { x:608, open:196, close:215, high:180, low:228, bull:true  }
+    ];
+    var bw = 28;
+
+    candles.forEach(function(c) {
+      var col = c.bull ? GREEN : RED;
+      var fillCol = c.bull ? GREEN_LIGHT : RED_LIGHT;
+      var bodyTop = Math.min(c.open, c.close);
+      var bodyBot = Math.max(c.open, c.close);
+      addLine(svg, c.x, c.high, c.x, bodyTop, col, 1.5);
+      addLine(svg, c.x, bodyBot, c.x, c.low, col, 1.5);
+      addRect(svg, c.x - bw/2, bodyTop, bw, bodyBot - bodyTop, fillCol, col, 2);
+    });
+
+    var dashLine = svgEl('line', { x1:30, y1:158, x2:640, y2:158, stroke:MUTED, 'stroke-width':0.75, 'stroke-dasharray':'5 4' });
+    svg.appendChild(dashLine);
+
+    addText(svg, 50,  138, 'Uptrend', 12, GREEN, 'middle', 500);
+    addText(svg, 237, 110, 'Pullback', 12, RED, 'middle', 500);
+    addText(svg, 420, 138, 'Resumes', 12, GREEN, 'middle', 500);
+    addText(svg, 515, 110, 'Fades', 12, RED, 'middle', 500);
+    addText(svg, 330, 308, 'Time  →', 12, MUTED, 'middle');
+  }
+
+  setView('anatomy', document.querySelector('button.active'));
+</script>
+</body>
+</html>
