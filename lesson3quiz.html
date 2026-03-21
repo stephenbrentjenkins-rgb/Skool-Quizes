@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 3 Quiz — Identifying Support & Resistance</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: #ffffff;
+    color: #1a1a1a;
+    padding: 32px 24px;
+    max-width: 720px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+  h2 { font-size: 20px; font-weight: 500; margin-bottom: 4px; }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 28px; }
+  .q-block { margin-bottom: 32px; }
+  .q-num { font-size: 11px; font-weight: 500; color: #999; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 6px; }
+  .q-text { font-size: 15px; font-weight: 500; color: #1a1a1a; margin-bottom: 14px; line-height: 1.5; }
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    cursor: pointer;
+    font-size: 14px;
+    color: #111111;
+    line-height: 1.5;
+    background: #fff;
+    transition: background 0.1s;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .opt:hover { background: #f5f5f5; }
+  .opt.correct { border-color: #0F6E56; border-width: 2px; background: #0F6E56; color: #ffffff; font-weight: 500; }
+  .opt.wrong { border-color: #A32D2D; border-width: 2px; background: #A32D2D; color: #ffffff; font-weight: 500; }
+  .opt.reveal-correct { border-color: #0F6E56; border-width: 2px; background: #0F6E56; color: #ffffff; font-weight: 500; }
+  .opt-letter { font-weight: 500; min-width: 18px; flex-shrink: 0; }
+  .feedback { font-size: 13px; margin-top: 8px; padding: 10px 14px; border-radius: 8px; line-height: 1.6; display: none; }
+  .feedback.show { display: block; }
+  .feedback.correct { background: #0a3d25; color: #4ade9a; border-left: 4px solid #0F6E56; font-weight: 400; }
+  .feedback.wrong { background: #3d0a0a; color: #f87171; border-left: 4px solid #A32D2D; font-weight: 400; }
+  hr { border: none; border-top: 1px solid #eeeeee; margin: 28px 0; }
+  .score-block { display: none; margin-top: 32px; padding: 24px; border-radius: 12px; border: 1px solid #e0e0e0; text-align: center; }
+  .score-block.show { display: block; }
+  .score-num { font-size: 40px; font-weight: 500; color: #1a1a1a; margin-bottom: 8px; }
+  .score-label { font-size: 14px; color: #666; }
+  .reset-btn {
+    margin-top: 18px; padding: 8px 22px; border-radius: 8px;
+    border: 1px solid #d0d0d0; background: #f5f5f5; color: #1a1a1a;
+    cursor: pointer; font-size: 14px; font-family: inherit; transition: background 0.1s;
+  }
+  .reset-btn:hover { background: #ebebeb; }
+
+  @media (prefers-color-scheme: dark) {
+    body { background: #141414; color: #e8e6e0; }
+    .q-text { color: #e8e6e0; }
+    .opt { background: #1e1e1e; border-color: #2e2e2e; color: #e8e6e0; }
+    .opt:hover { background: #252525; }
+    .opt.correct { background: #04342C; border-color: #0F6E56; color: #9FE1CB; }
+    .opt.wrong { background: #2e1010; border-color: #A32D2D; color: #f09595; }
+    .opt.reveal-correct { background: #04342C; border-color: #0F6E56; color: #9FE1CB; }
+    .feedback.correct { background: #04342C; color: #9FE1CB; }
+    .feedback.wrong { background: #2e1010; color: #f09595; }
+    hr { border-color: #2a2a2a; }
+    .score-block { border-color: #2e2e2e; }
+    .score-num { color: #e8e6e0; }
+    .score-label { color: #888; }
+    .reset-btn { background: #1e1e1e; color: #e8e6e0; border-color: #3a3a3a; }
+    .reset-btn:hover { background: #2a2a2a; }
+    .subtitle, h2 + .subtitle { color: #666; }
+  }
+</style>
+</head>
+<body>
+
+<h2>Lesson 3 Knowledge Check</h2>
+<p class="subtitle">Identifying support &amp; resistance — 5 questions</p>
+
+<div class="q-block" id="q1">
+  <div class="q-num">Question 1 of 5</div>
+  <div class="q-text">Why should you zoom out to 6–12 months before drawing S&amp;R levels?</div>
+  <div class="options">
+    <div class="opt"><span class="opt-letter">A</span>So the chart loads faster on TradingView</div>
+    <div class="opt"><span class="opt-letter">B</span>Because levels built up over a longer period are stronger and more significant</div>
+    <div class="opt"><span class="opt-letter">C</span>So you can see more candles and find more levels to draw</div>
+    <div class="opt"><span class="opt-letter">D</span>Because short-term charts are only for professional traders</div>
+  </div>
+  <div class="feedback correct" id="q1-c">Correct. A level that's been respected five times over a year carries far more weight than one that appeared twice last week. The history tells you how many traders are aware of — and responding to — that level.</div>
+  <div class="feedback wrong" id="q1-w">The reason is about strength, not convenience. Levels tested over a longer timeframe have been seen by more traders — making them more significant and more likely to hold.</div>
+</div>
+
+<hr>
+
+<div class="q-block" id="q2">
+  <div class="q-num">Question 2 of 5</div>
+  <div class="q-text">When identifying S&amp;R levels, why do we "look left" on the chart?</div>
+  <div class="options">
+    <div class="opt"><span class="opt-letter">A</span>Because the most recent price action is always on the left</div>
+    <div class="opt"><span class="opt-letter">B</span>To find where price has previously stalled or reversed — that history tells us where levels are likely to form again</div>
+    <div class="opt"><span class="opt-letter">C</span>Because left-side levels are always stronger than right-side levels</div>
+    <div class="opt"><span class="opt-letter">D</span>To see what the stock was priced at when it first launched</div>
+  </div>
+  <div class="feedback correct" id="q2-c">Exactly right. Price has memory. Where it has reversed before, it's likely to react again — because the same groups of traders are watching those same levels. The left side of the chart is your evidence.</div>
+  <div class="feedback wrong" id="q2-w">Looking left means studying past price behaviour. The evidence for where levels exist is always to the left — that's where the reversals, bounces, and stalls have already happened.</div>
+</div>
+
+<hr>
+
+<div class="q-block" id="q3">
+  <div class="q-num">Question 3 of 5</div>
+  <div class="q-text">Why should you draw support and resistance as a zone rather than an exact price line?</div>
+  <div class="options">
+    <div class="opt"><span class="opt-letter">A</span>Because TradingView doesn't support exact price lines</div>
+    <div class="opt"><span class="opt-letter">B</span>To make the chart look less cluttered</div>
+    <div class="opt"><span class="opt-letter">C</span>Because price rarely bounces at the exact same number each time — it reacts within a range</div>
+    <div class="opt"><span class="opt-letter">D</span>Because zones are easier to draw than exact lines</div>
+  </div>
+  <div class="feedback correct" id="q3-c">Spot on. Price doesn't bounce at $155.00 to the penny every time. It reacts in a zone — sometimes $154.20, sometimes $156.80. Drawing a zone accounts for this and prevents you from being stopped out unnecessarily.</div>
+  <div class="feedback wrong" id="q3-w">Price behaviour isn't precise — it reacts within a range, not at an exact number. Drawing a zone rather than a line accounts for this natural variability and keeps you flexible.</div>
+</div>
+
+<hr>
+
+<div class="q-block" id="q4">
+  <div class="q-num">Question 4 of 5</div>
+  <div class="q-text">A support level has been tested and held four times over the past eight months. How would you rate this level?</div>
+  <div class="options">
+    <div class="opt"><span class="opt-letter">A</span>Weak — price keeps returning to it, which means it will eventually break</div>
+    <div class="opt"><span class="opt-letter">B</span>Irrelevant — old levels don't matter once enough time has passed</div>
+    <div class="opt"><span class="opt-letter">C</span>Strong — four touches over eight months means many traders are watching and defending that level</div>
+    <div class="opt"><span class="opt-letter">D</span>Moderate — you need at least ten touches for a level to be truly strong</div>
+  </div>
+  <div class="feedback correct" id="q4-c">Correct. Four touches = a very strong level. Every touch adds more evidence and more trader awareness. More traders watching a level means a more significant reaction when price approaches it again.</div>
+  <div class="feedback wrong" id="q4-w">More touches = stronger level, not weaker. Four touches over eight months means a large number of traders have seen price react there — making them more likely to act on it in the future.</div>
+</div>
+
+<hr>
+
+<div class="q-block" id="q5">
+  <div class="q-num">Question 5 of 5</div>
+  <div class="q-text">You're analysing a chart and can identify eight possible S&amp;R levels. What should you do?</div>
+  <div class="options">
+    <div class="opt"><span class="opt-letter">A</span>Draw all eight — more levels give you more trading opportunities</div>
+    <div class="opt"><span class="opt-letter">B</span>Narrow it down to the two or three most obvious and well-tested levels only</div>
+    <div class="opt"><span class="opt-letter">C</span>Pick the highest and lowest levels and ignore everything in between</div>
+    <div class="opt"><span class="opt-letter">D</span>Only use levels from the last 30 days</div>
+  </div>
+  <div class="feedback correct" id="q5-c">Exactly right. Less is more. Two or three strong, obvious levels will serve you far better than eight questionable ones. If a level doesn't jump out at you immediately, it probably isn't strong enough to trade from with confidence.</div>
+  <div class="feedback wrong" id="q5-w">More levels = more confusion, not more opportunity. The goal is to identify the two or three that are most obvious and well-tested. Quality over quantity — every time.</div>
+</div>
+
+<div class="score-block" id="score">
+  <div class="score-num" id="score-num">0/5</div>
+  <div class="score-label" id="score-label"></div>
+  <button class="reset-btn" onclick="resetQuiz()">Retake quiz</button>
+</div>
+
+<script>
+  var correctIndex = { q1: 1, q2: 1, q3: 2, q4: 2, q5: 1 };
+  var answered = {};
+
+  function init() {
+    Object.keys(correctIndex).forEach(function(qid) {
+      var opts = document.querySelectorAll('#' + qid + ' .opt');
+      opts.forEach(function(opt, i) {
+        opt.addEventListener('click', function() { answer(qid, opt, i === correctIndex[qid]); });
+      });
+    });
+  }
+
+  function answer(qid, el, correct) {
+    if (answered[qid] !== undefined) return;
+    answered[qid] = correct;
+    var opts = document.querySelectorAll('#' + qid + ' .opt');
+    opts.forEach(function(o) { o.style.pointerEvents = 'none'; });
+    if (correct) {
+      el.classList.add('correct');
+      document.getElementById(qid + '-c').classList.add('show');
+    } else {
+      el.classList.add('wrong');
+      opts[correctIndex[qid]].classList.add('reveal-correct');
+      document.getElementById(qid + '-w').classList.add('show');
+    }
+    if (Object.keys(answered).length === 5) showScore();
+  }
+
+  function showScore() {
+    var score = Object.values(answered).filter(Boolean).length;
+    document.getElementById('score-num').textContent = score + '/5';
+    var labels = [
+      'Keep reviewing — rewatch the video and try the method on a real chart.',
+      'Good start — revisit the steps you missed before moving on.',
+      'Solid understanding — try the chart exercise before Lesson 4.',
+      'Great work — the method is clicking. Post your chart in the community!',
+      'Perfect score — you\'ve got the method. Now go draw some levels!'
+    ];
+    document.getElementById('score-label').textContent = labels[score];
+    document.getElementById('score').classList.add('show');
+  }
+
+  function resetQuiz() {
+    Object.keys(answered).forEach(function(k) { delete answered[k]; });
+    document.querySelectorAll('.opt').forEach(function(o) {
+      o.className = 'opt';
+      o.style.pointerEvents = '';
+    });
+    document.querySelectorAll('.feedback').forEach(function(f) { f.classList.remove('show'); });
+    document.getElementById('score').classList.remove('show');
+    init();
+  }
+
+  init();
+</script>
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 6 Quiz — Combining S&R with Indicators</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; background: #fff; color: #1a1a1a; padding: 32px 24px; max-width: 720px; margin: 0 auto; line-height: 1.6; }
+  h2 { font-size: 20px; font-weight: 500; margin-bottom: 4px; }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 28px; }
+  .q-block { margin-bottom: 32px; }
+  .q-num { font-size: 11px; font-weight: 500; color: #999; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 6px; }
+  .q-text { font-size: 15px; font-weight: 500; color: #1a1a1a; margin-bottom: 14px; line-height: 1.5; }
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .opt { display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px; border-radius: 8px; border: 1px solid #e0e0e0; cursor: pointer; font-size: 14px; color: #111; line-height: 1.5; background: #fff; transition: background .1s; -webkit-user-select: none; user-select: none; }
+  .opt:hover { background: #f5f5f5; }
+  .opt.correct { border-color: #0F6E56; border-width: 2px; background: #0F6E56; color: #ffffff; font-weight: 500; }
+  .opt.wrong { border-color: #A32D2D; border-width: 2px; background: #A32D2D; color: #ffffff; font-weight: 500; }
+  .opt.reveal-correct { border-color: #0F6E56; border-width: 2px; background: #0F6E56; color: #ffffff; font-weight: 500; }
+  .opt-letter { font-weight: 500; min-width: 18px; flex-shrink: 0; }
+  .feedback { font-size: 13px; margin-top: 8px; padding: 10px 14px; border-radius: 8px; line-height: 1.6; display: none; }
+  .feedback.show { display: block; }
+  .feedback.correct { background: #0a3d25; color: #4ade9a; border-left: 4px solid #0F6E56; font-weight: 400; }
+  .feedback.wrong { background: #3d0a0a; color: #f87171; border-left: 4px solid #A32D2D; font-weight: 400; }
+  hr { border: none; border-top: 1px solid #eee; margin: 28px 0; }
+  .score-block { display: none; margin-top: 32px; padding: 24px; border-radius: 12px; border: 1px solid #e0e0e0; text-align: center; }
+  .score-block.show { display: block; }
+  .score-num { font-size: 40px; font-weight: 500; color: #1a1a1a; margin-bottom: 8px; }
+  .score-label { font-size: 14px; color: #666; }
+  .reset-btn { margin-top: 18px; padding: 8px 22px; border-radius: 8px; border: 1px solid #d0d0d0; background: #f5f5f5; color: #1a1a1a; cursor: pointer; font-size: 14px; font-family: inherit; transition: background .1s; }
+  .reset-btn:hover { background: #ebebeb; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #141414; color: #e8e6e0; }
+    .q-text { color: #e8e6e0; }
+    .opt { background: #1e1e1e; border-color: #2e2e2e; color: #e8e6e0; }
+    .opt:hover { background: #252525; }
+    .opt.correct { background: #04342C; border-color: #0F6E56; color: #9FE1CB; }
+    .opt.wrong { background: #2e1010; border-color: #A32D2D; color: #f09595; }
+    .opt.reveal-correct { background: #04342C; border-color: #0F6E56; color: #9FE1CB; }
+    .feedback.correct { background: #04342C; color: #9FE1CB; }
+    .feedback.wrong { background: #2e1010; color: #f09595; }
+    hr { border-color: #2a2a2a; }
+    .score-block { border-color: #2e2e2e; }
+    .score-num { color: #e8e6e0; }
+    .score-label { color: #888; }
+    .reset-btn { background: #1e1e1e; color: #e8e6e0; border-color: #3a3a3a; }
+    .reset-btn:hover { background: #2a2a2a; }
+    .subtitle { color: #666; }
+  }
+</style>
+</head>
+<body>
+<h2>Lesson 6 Knowledge Check</h2>
+<p class="subtitle">Combining S&amp;R with indicators — 5 questions</p>
+
+<div class="q-block" id="q1">
+  <div class="q-num">Question 1 of 5</div>
+  <div class="q-text">Price is approaching a support level and the RSI reading is 28. What does this tell you?</div>
+  <div class="options">
+    <div class="opt"><span class="opt-letter">A</span>The support level is about to break — RSI below 30 means the selling is too strong</div>
+    <div class="opt"><span class="opt-letter">B</span>Two signals are aligning — price is at a key buying level AND momentum is oversold, increasing the probability of a bounce</div>
+    <div class="opt"><span class="opt-letter">C</span>RSI below 30 means you should always sell, regardless of the S&R level</div>
+    <div class="opt"><span class="opt-letter">D</span>The RSI reading is irrelevant — only the S&R level matters</div>
+  </div>
+  <div class="feedback correct" id="q1-c">Correct. RSI near 30 (oversold) at a support level is classic confluence. Both indicators are pointing in the same direction — momentum is stretched to the downside at a historically significant buying level. That's a high-probability bounce setup.</div>
+  <div class="feedback wrong" id="q1-w">RSI below 30 doesn't mean sell — it means oversold, which combined with support means the opposite. Two signals aligning (price at support + RSI oversold) creates confluence, increasing the probability of a bounce higher.</div>
+</div>
+
+<hr>
+
+<div class="q-block" id="q2">
+  <div class="q-num">Question 2 of 5</div>
+  <div class="q-text">What does it mean when the 50-day moving average coincides with a horizontal support level?</div>
+  <div class="options">
+    <div class="opt"><span class="opt-letter">A</span>The support level is now invalid and should be ignored</div>
+    <div class="opt"><span class="opt-letter">B</span>It creates a strong confluence zone — two different reasons for buyers to show up at the same price</div>
+    <div class="opt"><span class="opt-letter">C</span>It means price will definitely bounce — this setup never fails</div>
+    <div class="opt"><span class="opt-letter">D</span>Moving averages and S&R levels should never be used together</div>
+  </div>
+  <div class="feedback correct" id="q2-c">Exactly right. When a horizontal support zone and the 50 MA overlap, you have two completely different reasons for buying pressure to emerge at the same price. These confluence zones tend to produce the strongest, most reliable reactions.</div>
+  <div class="feedback wrong" id="q2-w">When the 50 MA sits at a horizontal S&R level, it creates confluence — two different analytical methods pointing to the same area as significant. More reasons for buyers to show up = stronger likely reaction. No setup is guaranteed, but this increases probability.</div>
+</div>
+
+<hr>
+
+<div class="q-block" id="q3">
+  <div class="q-num">Question 3 of 5</div>
+  <div class="q-text">A stock breaks above resistance on very low volume. What should you think?</div>
+  <div class="options">
+    <div class="opt"><span class="opt-letter">A</span>Low volume breakouts are more reliable because there are fewer sellers in the way</div>
+    <div class="opt"><span class="opt-letter">B</span>This is a strong breakout — volume doesn't matter once price crosses the level</div>
+    <div class="opt"><span class="opt-letter">C</span>Be cautious — low volume breakouts are a common warning sign for fakeouts, as the move lacks broad market participation</div>
+    <div class="opt"><span class="opt-letter">D</span>Immediately buy — any break above resistance is a strong buy signal</div>
+  </div>
+  <div class="feedback correct" id="q3-c">Correct. Low volume on a breakout is a red flag. If the move had real conviction behind it, you'd expect elevated volume as more market participants jump in. Low volume suggests thin participation — the move is vulnerable to reversal. Be cautious or wait for volume confirmation.</div>
+  <div class="feedback wrong" id="q3-w">Low volume breakouts are a warning sign, not a green light. A genuine breakout should attract participants — which shows up as elevated volume. Low volume means few traders are actually behind the move, making it more likely to reverse (fakeout).</div>
+</div>
+
+<hr>
+
+<div class="q-block" id="q4">
+  <div class="q-num">Question 4 of 5</div>
+  <div class="q-text">What does an RSI reading above 70 tell you when price is approaching resistance?</div>
+  <div class="options">
+    <div class="opt"><span class="opt-letter">A</span>The stock has strong momentum and will definitely break through resistance</div>
+    <div class="opt"><span class="opt-letter">B</span>RSI above 70 is a buy signal — the stock is strong</div>
+    <div class="opt"><span class="opt-letter">C</span>The stock is overbought at resistance — both signals suggest sellers may step in and push price back down</div>
+    <div class="opt"><span class="opt-letter">D</span>RSI above 70 means the stock is undervalued and cheap to buy</div>
+  </div>
+  <div class="feedback correct" id="q4-c">Correct. RSI above 70 (overbought) at a resistance level is powerful confluence for a rejection setup. Momentum is stretched to the upside AND price is at a historically significant selling level. Both signals point to increased probability of a pullback.</div>
+  <div class="feedback wrong" id="q4-w">RSI above 70 means overbought — which at resistance is a warning, not a buy signal. Momentum is stretched just as price reaches a level where sellers historically show up. Both signals agree: the rally may be running out of steam. Watch for rejection.</div>
+</div>
+
+<hr>
+
+<div class="q-block" id="q5">
+  <div class="q-num">Question 5 of 5</div>
+  <div class="q-text">You find a setup with price at support, RSI at 32, and the 50 MA nearby — but volume is very low. What do you do?</div>
+  <div class="options">
+    <div class="opt"><span class="opt-letter">A</span>Enter immediately — three signals is more than enough</div>
+    <div class="opt"><span class="opt-letter">B</span>Skip it — you need all four signals to align before entering any trade</div>
+    <div class="opt"><span class="opt-letter">C</span>Enter with reduced size or wait to see if volume picks up — three signals are good but low volume is a notable concern</div>
+    <div class="opt"><span class="opt-letter">D</span>Ignore the volume — it only matters on breakout trades, not bounce trades</div>
+  </div>
+  <div class="feedback correct" id="q5-c">Well reasoned. Three confluence signals is good, but low volume on a bounce is a concern — it means fewer participants are behind the move. Entering with reduced position size or waiting for volume to confirm are both sensible approaches. You don't need all four signals every time, but each missing one lowers your conviction.</div>
+  <div class="feedback wrong" id="q5-w">Three signals is good, but volume matters on bounce trades too — it confirms that real buying pressure is behind the move. With low volume, consider entering smaller than normal or waiting for a volume pickup before committing fully. Manage the uncertainty rather than ignoring it.</div>
+</div>
+
+<div class="score-block" id="score">
+  <div class="score-num" id="score-num">0/5</div>
+  <div class="score-label" id="score-label"></div>
+  <button class="reset-btn" onclick="resetQuiz()">Retake quiz</button>
+</div>
+
+<script>
+  var correctIndex = { q1:1, q2:1, q3:2, q4:2, q5:2 };
+  var answered = {};
+  function init() {
+    Object.keys(correctIndex).forEach(function(qid) {
+      var opts = document.querySelectorAll('#'+qid+' .opt');
+      opts.forEach(function(opt,i){ opt.addEventListener('click',function(){ answer(qid,opt,i===correctIndex[qid]); }); });
+    });
+  }
+  function answer(qid, el, correct) {
+    if (answered[qid] !== undefined) return;
+    answered[qid] = correct;
+    var opts = document.querySelectorAll('#'+qid+' .opt');
+    opts.forEach(function(o){ o.style.pointerEvents='none'; });
+    if (correct) { el.classList.add('correct'); document.getElementById(qid+'-c').classList.add('show'); }
+    else { el.classList.add('wrong'); opts[correctIndex[qid]].classList.add('reveal-correct'); document.getElementById(qid+'-w').classList.add('show'); }
+    if (Object.keys(answered).length===5) showScore();
+  }
+  function showScore() {
+    var score = Object.values(answered).filter(Boolean).length;
+    document.getElementById('score-num').textContent = score+'/5';
+    var labels = ['Keep reviewing — rewatch the video before moving on.','Good effort — revisit the questions you missed.','Solid grasp — the confluence concept is clicking.','Great work — you understand how indicators layer together!','Perfect score — on to Lesson 7!'];
+    document.getElementById('score-label').textContent = labels[score];
+    document.getElementById('score').classList.add('show');
+  }
+  function resetQuiz() {
+    Object.keys(answered).forEach(function(k){ delete answered[k]; });
+    document.querySelectorAll('.opt').forEach(function(o){ o.className='opt'; o.style.pointerEvents=''; });
+    document.querySelectorAll('.feedback').forEach(function(f){ f.classList.remove('show'); });
+    document.getElementById('score').classList.remove('show');
+    init();
+  }
+  init();
+</script>
+</body>
+</html>

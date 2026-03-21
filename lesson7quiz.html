@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 7 Quiz — Risk Management</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; background: #fff; color: #1a1a1a; padding: 32px 24px; max-width: 720px; margin: 0 auto; line-height: 1.6; }
+  h2 { font-size: 20px; font-weight: 500; margin-bottom: 4px; }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 28px; }
+  .q-block { margin-bottom: 32px; }
+  .q-num { font-size: 11px; font-weight: 500; color: #999; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 6px; }
+  .q-text { font-size: 15px; font-weight: 500; color: #1a1a1a; margin-bottom: 14px; line-height: 1.5; }
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .opt { display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px; border-radius: 8px; border: 1px solid #e0e0e0; cursor: pointer; font-size: 14px; color: #111; line-height: 1.5; background: #fff; transition: background .1s; -webkit-user-select: none; user-select: none; }
+  .opt:hover { background: #f5f5f5; }
+  .opt.correct { border-color: #0F6E56; border-width: 2px; background: #0F6E56; color: #ffffff; font-weight: 500; }
+  .opt.wrong { border-color: #A32D2D; border-width: 2px; background: #A32D2D; color: #ffffff; font-weight: 500; }
+  .opt.reveal-correct { border-color: #0F6E56; border-width: 2px; background: #0F6E56; color: #ffffff; font-weight: 500; }
+  .opt-letter { font-weight: 500; min-width: 18px; flex-shrink: 0; }
+  .feedback { font-size: 13px; margin-top: 8px; padding: 10px 14px; border-radius: 8px; line-height: 1.6; display: none; }
+  .feedback.show { display: block; }
+  .feedback.correct { background: #0a3d25; color: #4ade9a; border-left: 4px solid #0F6E56; font-weight: 400; }
+  .feedback.wrong { background: #3d0a0a; color: #f87171; border-left: 4px solid #A32D2D; font-weight: 400; }
+  hr { border: none; border-top: 1px solid #eee; margin: 28px 0; }
+  .score-block { display: none; margin-top: 32px; padding: 24px; border-radius: 12px; border: 1px solid #e0e0e0; text-align: center; }
+  .score-block.show { display: block; }
+  .score-num { font-size: 40px; font-weight: 500; color: #1a1a1a; margin-bottom: 8px; }
+  .score-label { font-size: 14px; color: #666; }
+  .reset-btn { margin-top: 18px; padding: 8px 22px; border-radius: 8px; border: 1px solid #d0d0d0; background: #f5f5f5; color: #1a1a1a; cursor: pointer; font-size: 14px; font-family: inherit; }
+  .reset-btn:hover { background: #ebebeb; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #141414; color: #e8e6e0; }
+    .q-text { color: #e8e6e0; }
+    .opt { background: #1e1e1e; border-color: #2e2e2e; color: #e8e6e0; }
+    .opt:hover { background: #252525; }
+    .opt.correct { background: #04342C; border-color: #0F6E56; color: #9FE1CB; }
+    .opt.wrong { background: #2e1010; border-color: #A32D2D; color: #f09595; }
+    .opt.reveal-correct { background: #04342C; border-color: #0F6E56; color: #9FE1CB; }
+    .feedback.correct { background: #04342C; color: #9FE1CB; }
+    .feedback.wrong { background: #2e1010; color: #f09595; }
+    hr { border-color: #2a2a2a; }
+    .score-block { border-color: #2e2e2e; }
+    .score-num { color: #e8e6e0; }
+    .score-label { color: #888; }
+    .reset-btn { background: #1e1e1e; color: #e8e6e0; border-color: #3a3a3a; }
+    .reset-btn:hover { background: #2a2a2a; }
+    .subtitle { color: #666; }
+  }
+</style>
+</head>
+<body>
+<h2>Lesson 7 Knowledge Check</h2>
+<p class="subtitle">Risk management at S&amp;R levels — 5 questions</p>
+
+<div class="q-block" id="q1">
+  <div class="q-num">Question 1 of 5</div>
+  <div class="q-text">For a bounce trade at support, where should your stop loss be placed?</div>
+  <div class="options">
+    <div class="opt"><span class="opt-letter">A</span>Exactly at the support level — the moment it's breached, you're out</div>
+    <div class="opt"><span class="opt-letter">B</span>Just below the support zone — giving a small buffer for normal price volatility</div>
+    <div class="opt"><span class="opt-letter">C</span>At a fixed 5% below your entry price, regardless of the level</div>
+    <div class="opt"><span class="opt-letter">D</span>At the previous swing low from several weeks ago</div>
+  </div>
+  <div class="feedback correct" id="q1-c">Correct. Placing the stop just below the zone (not right at the level) gives the trade breathing room for normal volatility — price often pokes briefly through support before bouncing. A stop right at the line can get triggered by a temporary dip that then reverses.</div>
+  <div class="feedback wrong" id="q1-w">Your stop should go just below the support zone, not right at it. Price often briefly pokes through a level before bouncing — a stop at the exact level can get triggered unnecessarily. The small buffer separates a genuine break from normal volatility.</div>
+</div>
+
+<hr>
+
+<div class="q-block" id="q2">
+  <div class="q-num">Question 2 of 5</div>
+  <div class="q-text">Your entry is $80, stop is $76, and target is $92. What is your risk-to-reward ratio?</div>
+  <div class="options">
+    <div class="opt"><span class="opt-letter">A</span>1:1 — risk and reward are equal</div>
+    <div class="opt"><span class="opt-letter">B</span>2:1 — reward is twice the risk</div>
+    <div class="opt"><span class="opt-letter">C</span>3:1 — reward is three times the risk</div>
+    <div class="opt"><span class="opt-letter">D</span>4:1 — reward is four times the risk</div>
+  </div>
+  <div class="feedback correct" id="q2-c">Correct. Risk = $80 - $76 = $4. Reward = $92 - $80 = $12. Ratio = $12 ÷ $4 = 3:1. This is an excellent setup — well above the 2:1 minimum.</div>
+  <div class="feedback wrong" id="q2-w">Let's work it through: Risk = entry minus stop = $80 - $76 = $4. Reward = target minus entry = $92 - $80 = $12. Ratio = $12 ÷ $4 = 3:1. A strong setup.</div>
+</div>
+
+<hr>
+
+<div class="q-block" id="q3">
+  <div class="q-num">Question 3 of 5</div>
+  <div class="q-text">You have a $5,000 account and use the 2% rule. Your entry is $100 and your stop is $95. How many shares can you buy?</div>
+  <div class="options">
+    <div class="opt"><span class="opt-letter">A</span>10 shares</div>
+    <div class="opt"><span class="opt-letter">B</span>20 shares</div>
+    <div class="opt"><span class="opt-letter">C</span>50 shares</div>
+    <div class="opt"><span class="opt-letter">D</span>100 shares</div>
+  </div>
+  <div class="feedback correct" id="q3-c">Correct. Max risk = 2% of $5,000 = $100. Risk per share = $100 - $95 = $5. Position size = $100 ÷ $5 = 20 shares. Total position value = $2,000 (40% of account) — but your actual risk is only $100 (2%).</div>
+  <div class="feedback wrong" id="q3-w">Here's the calculation: Max risk = 2% × $5,000 = $100. Risk per share = entry minus stop = $100 - $95 = $5. Shares = max risk ÷ risk per share = $100 ÷ $5 = 20 shares.</div>
+</div>
+
+<hr>
+
+<div class="q-block" id="q4">
+  <div class="q-num">Question 4 of 5</div>
+  <div class="q-text">What is the purpose of a trailing stop?</div>
+  <div class="options">
+    <div class="opt"><span class="opt-letter">A</span>To automatically increase your position size as profit grows</div>
+    <div class="opt"><span class="opt-letter">B</span>To move your stop in the direction of the trade as price moves in your favour, locking in profit</div>
+    <div class="opt"><span class="opt-letter">C</span>To set a wider stop so you're less likely to be stopped out</div>
+    <div class="opt"><span class="opt-letter">D</span>To automatically exit the trade at a fixed profit target</div>
+  </div>
+  <div class="feedback correct" id="q4-c">Exactly right. A trailing stop follows price as it moves in your favour, locking in gains. If the trade reverses, the trailing stop exits you — ensuring you keep most of the profit rather than giving it all back.</div>
+  <div class="feedback wrong" id="q4-w">A trailing stop moves with price as it goes in your favour. Once price moves up (for a long trade), you move the stop up — this locks in profit and ensures you won't give it all back if the trade reverses.</div>
+</div>
+
+<hr>
+
+<div class="q-block" id="q5">
+  <div class="q-num">Question 5 of 5</div>
+  <div class="q-text">Why is risk management more important than having a great entry strategy?</div>
+  <div class="options">
+    <div class="opt"><span class="opt-letter">A</span>It isn't — a perfect entry eliminates the need for risk management</div>
+    <div class="opt"><span class="opt-letter">B</span>Because even a trader who is right only 40% of the time can be profitable with a strong risk-to-reward ratio and position sizing discipline</div>
+    <div class="opt"><span class="opt-letter">C</span>Because stop losses guarantee you will never lose money</div>
+    <div class="opt"><span class="opt-letter">D</span>Because risk management replaces the need to identify support and resistance levels</div>
+  </div>
+  <div class="feedback correct" id="q5-c">Correct. With a 3:1 risk-to-reward ratio, you can be profitable with a 34% win rate. Risk management keeps you in the game through the inevitable losing trades, while a great entry strategy without it can be destroyed by one oversized loss.</div>
+  <div class="feedback wrong" id="q5-w">Risk management matters more because it determines whether you survive losing trades — which every trader has. With proper sizing and a 3:1 ratio, you only need to be right 34% of the time to break even. Poor risk management can wipe out a good win rate in a single bad trade.</div>
+</div>
+
+<div class="score-block" id="score">
+  <div class="score-num" id="score-num">0/5</div>
+  <div class="score-label" id="score-label"></div>
+  <button class="reset-btn" onclick="resetQuiz()">Retake quiz</button>
+</div>
+
+<script>
+  var correctIndex = { q1:1, q2:2, q3:1, q4:1, q5:1 };
+  var answered = {};
+  function init() {
+    Object.keys(correctIndex).forEach(function(qid) {
+      var opts = document.querySelectorAll('#'+qid+' .opt');
+      opts.forEach(function(opt,i){ opt.addEventListener('click',function(){ answer(qid,opt,i===correctIndex[qid]); }); });
+    });
+  }
+  function answer(qid, el, correct) {
+    if (answered[qid] !== undefined) return;
+    answered[qid] = correct;
+    var opts = document.querySelectorAll('#'+qid+' .opt');
+    opts.forEach(function(o){ o.style.pointerEvents='none'; });
+    if (correct) { el.classList.add('correct'); document.getElementById(qid+'-c').classList.add('show'); }
+    else { el.classList.add('wrong'); opts[correctIndex[qid]].classList.add('reveal-correct'); document.getElementById(qid+'-w').classList.add('show'); }
+    if (Object.keys(answered).length===5) showScore();
+  }
+  function showScore() {
+    var score = Object.values(answered).filter(Boolean).length;
+    document.getElementById('score-num').textContent = score+'/5';
+    var labels = ['Keep reviewing — this lesson is too important to skip.','Good effort — revisit the questions you missed.','Solid understanding — the concepts are sticking.','Great work — you understand risk management well!','Perfect score — you\'re ready for the final lesson!'];
+    document.getElementById('score-label').textContent = labels[score];
+    document.getElementById('score').classList.add('show');
+  }
+  function resetQuiz() {
+    Object.keys(answered).forEach(function(k){ delete answered[k]; });
+    document.querySelectorAll('.opt').forEach(function(o){ o.className='opt'; o.style.pointerEvents=''; });
+    document.querySelectorAll('.feedback').forEach(function(f){ f.classList.remove('show'); });
+    document.getElementById('score').classList.remove('show');
+    init();
+  }
+  init();
+</script>
+</body>
+</html>
