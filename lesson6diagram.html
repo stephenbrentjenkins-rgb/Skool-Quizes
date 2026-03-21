@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 6 — Combining S&R with Indicators</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; background: #f9f9f7; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 32px 16px; }
+  .card { background: #fff; border-radius: 16px; border: 1px solid #e8e8e4; padding: 28px 28px 24px; max-width: 720px; width: 100%; }
+  .lesson-tag { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .07em; color: #999; margin-bottom: 6px; }
+  h1 { font-size: 20px; font-weight: 500; color: #1a1a1a; margin-bottom: 4px; }
+  .subtitle { font-size: 13px; color: #999; margin-bottom: 20px; }
+  .controls { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+  button { font-size: 13px; font-family: inherit; padding: 6px 16px; border-radius: 20px; border: 1px solid #ddd; background: #f5f5f3; color: #444; cursor: pointer; transition: all .15s; }
+  button:hover { background: #ececea; border-color: #ccc; }
+  button.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+  .chart-wrap { background: #fafaf8; border: 1px solid #eeeeea; border-radius: 10px; padding: 12px; margin-bottom: 14px; }
+  svg { display: block; width: 100%; }
+  .callout { padding: 14px 16px; border-radius: 10px; background: #f5f5f3; border-left: 3px solid #999; font-size: 13px; color: #555; line-height: 1.75; }
+  .callout strong { color: #1a1a1a; display: block; margin-bottom: 5px; font-size: 14px; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 14px; }
+  .leg { display: flex; align-items: center; gap: 7px; font-size: 12px; color: #777; }
+  .leg-line { width: 20px; height: 2px; flex-shrink: 0; }
+  .leg-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #141414; }
+    .card { background: #1e1e1e; border-color: #2e2e2e; }
+    h1 { color: #e8e6e0; }
+    .subtitle, .lesson-tag { color: #666; }
+    button { background: #2a2a2a; color: #c2c0b6; border-color: #3a3a3a; }
+    button:hover { background: #333; }
+    button.active { background: #e8e6e0; color: #1a1a1a; border-color: #e8e6e0; }
+    .chart-wrap { background: #181818; border-color: #2a2a2a; }
+    .callout { background: #252525; border-color: #555; color: #a0a09a; }
+    .callout strong { color: #e8e6e0; }
+    .leg { color: #888; }
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="lesson-tag">Lesson 6 · Advanced application</div>
+  <h1>S&R confluence with indicators</h1>
+  <p class="subtitle">Click each indicator to see how it combines with support &amp; resistance</p>
+  <div class="controls">
+    <button class="active" onclick="setView('rsi',this)">RSI</button>
+    <button onclick="setView('ma',this)">Moving average</button>
+    <button onclick="setView('volume',this)">Volume</button>
+    <button onclick="setView('all',this)">All together</button>
+  </div>
+  <div class="chart-wrap">
+    <svg id="diagram" viewBox="0 0 660 320" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+  <div class="callout" id="callout">Loading...</div>
+  <div class="legend" id="legend"></div>
+</div>
+<script>
+  var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var TEXT = dark ? '#c2c0b6' : '#3d3d3a';
+  var MUTED = dark ? '#555' : '#bbb';
+  var BG = dark ? '#181818' : '#fafaf8';
+  var BORDER = dark ? '#2e2e2e' : '#e0e0dc';
+  var GREEN = '#0F6E56'; var GREEN_L = dark ? '#04342C' : '#E1F5EE';
+  var RED = '#A32D2D'; var RED_L = dark ? '#2e1010' : '#FCEBEB';
+  var PURPLE = '#534AB7'; var PURPLE_L = dark ? '#26215C' : '#EEEDFE';
+  var AMBER = '#854F0B'; var AMBER_L = dark ? '#412402' : '#FAEEDA';
+  var BLUE = '#185FA5'; var BLUE_L = dark ? '#042C53' : '#E6F1FB';
+  var BW = 24;
+
+  function el(tag, attrs) {
+    var e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    Object.keys(attrs).forEach(function(k) { e.setAttribute(k, attrs[k]); });
+    return e;
+  }
+  function txt(svg, x, y, t, size, fill, anchor) {
+    var e = el('text', { x:x, y:y, 'font-family':'-apple-system,sans-serif', 'font-size':size||11, fill:fill||TEXT, 'text-anchor':anchor||'start', 'dominant-baseline':'central' });
+    e.textContent = t; svg.appendChild(e);
+  }
+  function candle(svg, x, o, c, h, l, opacity) {
+    var bull = c <= o; var col = bull ? GREEN : RED; var fill = bull ? GREEN_L : RED_L;
+    var top = Math.min(o,c), bot = Math.max(o,c);
+    var op = opacity || 1;
+    svg.appendChild(el('line',{x1:x+BW/2,y1:h,x2:x+BW/2,y2:top,stroke:col,'stroke-width':1.5,'stroke-linecap':'round',opacity:op}));
+    svg.appendChild(el('line',{x1:x+BW/2,y1:bot,x2:x+BW/2,y2:l,stroke:col,'stroke-width':1.5,'stroke-linecap':'round',opacity:op}));
+    svg.appendChild(el('rect',{x:x,y:top,width:BW,height:Math.max(bot-top,3),fill:fill,stroke:col,'stroke-width':1,rx:2,opacity:op}));
+  }
+
+  var priceCandles = [
+    {x:20, o:180,c:162,h:152,l:190},{x:54, o:165,c:178,h:155,l:185},
+    {x:88, o:175,c:160,h:150,l:185},{x:122,o:162,c:175,h:152,l:180},
+    {x:156,o:172,c:158,h:148,l:180},{x:190,o:160,c:172,h:150,l:178},
+    {x:224,o:170,c:155,h:145,l:180},{x:258,o:158,c:148,h:138,l:168},
+    {x:292,o:150,c:162,h:140,l:170},{x:326,o:160,c:175,h:150,l:182},
+    {x:360,o:172,c:160,h:150,l:180},{x:394,o:162,c:175,h:152,l:182},
+    {x:428,o:172,c:188,h:162,l:195},{x:462,o:185,c:172,h:162,l:192},
+    {x:496,o:175,c:188,h:165,l:195},{x:530,o:185,c:198,h:175,l:205},
+    {x:564,o:195,c:182,h:172,l:202},{x:598,o:185,c:198,h:175,l:205}
+  ];
+  var SUP = 215;
+
+  function base(svg) {
+    svg.appendChild(el('rect',{x:0,y:0,width:660,height:320,fill:BG,rx:6}));
+    svg.appendChild(el('rect',{x:1,y:1,width:658,height:318,fill:'none',stroke:BORDER,'stroke-width':0.75,rx:5}));
+  }
+
+  function setView(mode, btn) {
+    document.querySelectorAll('button').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    var svg = document.getElementById('diagram');
+    while(svg.firstChild) svg.removeChild(svg.firstChild);
+    base(svg);
+    var callout = document.getElementById('callout');
+    var legend = document.getElementById('legend');
+
+    svg.appendChild(el('line',{x1:14,y1:SUP,x2:646,y2:SUP,stroke:GREEN,'stroke-width':1.5,'stroke-dasharray':'6 4'}));
+    txt(svg, 18, SUP-12, 'Support zone', 11, GREEN);
+    priceCandles.forEach(function(c){ candle(svg,c.x,c.o,c.c,c.h,c.l); });
+
+    if (mode === 'rsi') {
+      var rsiY = [260,255,262,258,265,260,268,278,272,260,255,252,248,254,250,245,252,248];
+      var rsiPath = 'M ' + (priceCandles[0].x+BW/2) + ' ' + rsiY[0];
+      for(var i=1;i<priceCandles.length;i++) { rsiPath += ' L ' + (priceCandles[i].x+BW/2) + ' ' + rsiY[i]; }
+      svg.appendChild(el('path',{d:rsiPath,fill:'none',stroke:PURPLE,'stroke-width':1.5,'stroke-linecap':'round','stroke-linejoin':'round'}));
+      svg.appendChild(el('line',{x1:14,y1:270,x2:646,y2:270,stroke:RED,'stroke-width':0.75,'stroke-dasharray':'3 3',opacity:0.6}));
+      txt(svg, 18, 264, 'RSI 30 (oversold)', 10, RED);
+      svg.appendChild(el('circle',{cx:priceCandles[7].x+BW/2,cy:rsiY[7],r:5,fill:PURPLE}));
+      svg.appendChild(el('circle',{cx:priceCandles[7].x+BW/2,cy:priceCandles[7].c,r:5,fill:GREEN}));
+      txt(svg, priceCandles[7].x+BW/2+8, 278, 'RSI near 30', 10, PURPLE);
+      txt(svg, priceCandles[7].x+BW/2+8, 143, 'Price at support', 10, GREEN);
+      txt(svg, 330, 310, 'RSI panel  →', 10, MUTED, 'middle');
+      callout.style.borderLeftColor = PURPLE;
+      callout.innerHTML = '<strong>RSI + support = strong bounce signal</strong>When price touches the support zone AND RSI is approaching 30 (oversold), both signals agree — the stock is at a significant buying level and momentum is stretched to the downside. This is one of the cleanest bounce setups available.';
+      legend.innerHTML = '<div class="leg"><div class="leg-line" style="background:'+GREEN+';border-top:2px dashed '+GREEN+'"></div>Support</div><div class="leg"><div class="leg-line" style="background:'+PURPLE+'"></div>RSI line</div><div class="leg"><div class="leg-dot" style="background:'+PURPLE+'"></div>RSI oversold signal</div>';
+    }
+
+    if (mode === 'ma') {
+      var maPoints = priceCandles.map(function(c,i){ return {x:c.x+BW/2, y:155+i*3.5}; });
+      var maPath = 'M ' + maPoints[0].x + ' ' + maPoints[0].y;
+      maPoints.forEach(function(p,i){ if(i>0) maPath += ' L ' + p.x + ' ' + p.y; });
+      svg.appendChild(el('path',{d:maPath,fill:'none',stroke:AMBER,'stroke-width':2,'stroke-linecap':'round','stroke-linejoin':'round'}));
+      txt(svg, 620, 202, '50 MA', 11, AMBER);
+      var confluenceX = priceCandles[7].x+BW/2;
+      svg.appendChild(el('rect',{x:confluenceX-30,y:SUP-18,width:60,height:36,fill:AMBER_L,rx:4,opacity:0.7}));
+      txt(svg, confluenceX, SUP, 'Confluence', 10, AMBER, 'middle');
+      callout.style.borderLeftColor = AMBER;
+      callout.innerHTML = '<strong>50 MA + support = double confluence</strong>When the 50-day moving average sits at the same level as a horizontal support zone, you have two completely different reasons for buyers to show up at the same price. These overlapping levels tend to produce the sharpest, most reliable reactions.';
+      legend.innerHTML = '<div class="leg"><div class="leg-line" style="background:'+GREEN+';border-top:2px dashed '+GREEN+'"></div>Support</div><div class="leg"><div class="leg-line" style="background:'+AMBER+'"></div>50 MA</div><div class="leg"><div class="leg-dot" style="background:'+AMBER_L+';border:1px solid '+AMBER+'"></div>Confluence zone</div>';
+    }
+
+    if (mode === 'volume') {
+      var vols = [30,25,28,22,32,20,24,42,18,38,28,22,18,30,24,36,20,28];
+      var maxV = Math.max.apply(null, vols);
+      vols.forEach(function(v,i) {
+        var c = priceCandles[i];
+        var barH = Math.round((v/maxV)*55);
+        var isHigh = v > 35;
+        svg.appendChild(el('rect',{x:c.x,y:310-barH,width:BW,height:barH,fill:isHigh?BLUE:MUTED,rx:1,opacity:isHigh?0.9:0.4}));
+      });
+      txt(svg, 330, 310, 'Volume bars', 10, MUTED, 'middle');
+      txt(svg, priceCandles[7].x+BW/2, 258, 'High volume', 10, BLUE, 'middle');
+      txt(svg, priceCandles[7].x+BW/2, 268, 'bounce', 10, BLUE, 'middle');
+      callout.style.borderLeftColor = BLUE;
+      callout.innerHTML = '<strong>Volume confirms conviction</strong>The bounce at support (candle 8) is accompanied by elevated volume — highlighted in blue. High volume means more market participants were involved in defending that level. Compare to the low-volume candles before and after — those moves carry less conviction and are harder to trust.';
+      legend.innerHTML = '<div class="leg"><div class="leg-line" style="background:'+GREEN+';border-top:2px dashed '+GREEN+'"></div>Support</div><div class="leg"><div class="leg-dot" style="background:'+BLUE+'"></div>High volume</div><div class="leg"><div class="leg-dot" style="background:'+MUTED+'"></div>Low volume</div>';
+    }
+
+    if (mode === 'all') {
+      var maP = priceCandles.map(function(c,i){ return {x:c.x+BW/2, y:175+i*2.5}; });
+      var maPath2 = 'M '+maP[0].x+' '+maP[0].y;
+      maP.forEach(function(p,i){ if(i>0) maPath2 += ' L '+p.x+' '+p.y; });
+      svg.appendChild(el('path',{d:maPath2,fill:'none',stroke:AMBER,'stroke-width':1.5,'stroke-linecap':'round','stroke-linejoin':'round',opacity:0.8}));
+      var rsiY2=[248,244,250,246,254,248,256,268,262,248,244,240,236,242,238,234,240,236];
+      var rsiPath2='M '+(priceCandles[0].x+BW/2)+' '+rsiY2[0];
+      for(var i=1;i<priceCandles.length;i++){ rsiPath2+=' L '+(priceCandles[i].x+BW/2)+' '+rsiY2[i]; }
+      svg.appendChild(el('path',{d:rsiPath2,fill:'none',stroke:PURPLE,'stroke-width':1,'stroke-linecap':'round','stroke-linejoin':'round',opacity:0.8}));
+      svg.appendChild(el('line',{x1:14,y1:262,x2:646,y2:262,stroke:RED,'stroke-width':0.5,'stroke-dasharray':'3 3',opacity:0.5}));
+      var vols2=[20,18,22,16,24,16,18,38,14,28,20,16,14,22,18,26,16,20];
+      var maxV2=Math.max.apply(null,vols2);
+      vols2.forEach(function(v,i){
+        var c=priceCandles[i]; var barH=Math.round((v/maxV2)*30);
+        var isH=v>30;
+        svg.appendChild(el('rect',{x:c.x,y:320-barH,width:BW,height:barH,fill:isH?BLUE:MUTED,rx:1,opacity:isH?0.9:0.35}));
+      });
+      var cx=priceCandles[7].x+BW/2;
+      svg.appendChild(el('circle',{cx:cx,cy:priceCandles[7].c,r:7,fill:'none',stroke:GREEN,'stroke-width':2}));
+      txt(svg,cx,130,'All 3 signals agree',11,GREEN,'middle');
+      callout.style.borderLeftColor='#185FA5';
+      callout.innerHTML='<strong>Maximum confluence — all three signals align</strong>At candle 8: price hits support (green dashed line), RSI approaches 30 (purple line near the red threshold), volume spikes high (blue bar), AND the 50 MA is nearby (amber line). Four confirming signals at once. This is the highest-conviction setup you can find.';
+      legend.innerHTML='<div class="leg"><div class="leg-line" style="background:'+GREEN+';border-top:2px dashed '+GREEN+'"></div>Support</div><div class="leg"><div class="leg-line" style="background:'+AMBER+'"></div>50 MA</div><div class="leg"><div class="leg-line" style="background:'+PURPLE+'"></div>RSI</div><div class="leg"><div class="leg-dot" style="background:'+BLUE+'"></div>High volume</div>';
+    }
+    txt(svg, 330, mode==='rsi'||mode==='volume'?308:296, 'Time  →', 10, MUTED, 'middle');
+  }
+  setView('rsi', document.querySelector('button.active'));
+</script>
+</body>
+</html>
