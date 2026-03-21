@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 5 — Bounce vs Breakout Diagram</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: #f9f9f7; min-height: 100vh;
+    display: flex; align-items: center; justify-content: center; padding: 32px 16px;
+  }
+  .card { background: #fff; border-radius: 16px; border: 1px solid #e8e8e4; padding: 28px 28px 24px; max-width: 720px; width: 100%; }
+  .lesson-tag { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .07em; color: #999; margin-bottom: 6px; }
+  h1 { font-size: 20px; font-weight: 500; color: #1a1a1a; margin-bottom: 4px; }
+  .subtitle { font-size: 13px; color: #999; margin-bottom: 20px; }
+  .controls { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+  button { font-size: 13px; font-family: inherit; padding: 6px 16px; border-radius: 20px; border: 1px solid #ddd; background: #f5f5f3; color: #444; cursor: pointer; transition: all .15s; }
+  button:hover { background: #ececea; border-color: #ccc; }
+  button.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+  .chart-wrap { background: #fafaf8; border: 1px solid #eeeeea; border-radius: 10px; padding: 12px; margin-bottom: 14px; }
+  svg { display: block; width: 100%; }
+  .callout { padding: 14px 16px; border-radius: 10px; background: #f5f5f3; border-left: 3px solid #999; font-size: 13px; color: #555; line-height: 1.75; }
+  .callout strong { color: #1a1a1a; display: block; margin-bottom: 5px; font-size: 14px; }
+  .legend { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 14px; }
+  .leg { display: flex; align-items: center; gap: 7px; font-size: 12px; color: #777; }
+  .leg-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #141414; }
+    .card { background: #1e1e1e; border-color: #2e2e2e; }
+    h1 { color: #e8e6e0; }
+    .subtitle, .lesson-tag { color: #666; }
+    button { background: #2a2a2a; color: #c2c0b6; border-color: #3a3a3a; }
+    button:hover { background: #333; }
+    button.active { background: #e8e6e0; color: #1a1a1a; border-color: #e8e6e0; }
+    .chart-wrap { background: #181818; border-color: #2a2a2a; }
+    .callout { background: #252525; border-color: #555; color: #a0a09a; }
+    .callout strong { color: #e8e6e0; }
+    .leg { color: #888; }
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="lesson-tag">Lesson 5 · Core skills</div>
+  <h1>Bounce trades vs breakout trades</h1>
+  <p class="subtitle">Click each button to see how each setup works on a chart</p>
+  <div class="controls">
+    <button class="active" onclick="setView('bounce',this)">Bounce trade</button>
+    <button onclick="setView('breakout',this)">Breakout trade</button>
+    <button onclick="setView('fakeout',this)">Fakeout (avoid!)</button>
+  </div>
+  <div class="chart-wrap">
+    <svg id="diagram" viewBox="0 0 660 300" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+  <div class="callout" id="callout">
+    <strong>Bounce trade</strong>
+    Price approaches support and shows a rejection candle with a long lower wick — sellers tried to push through but failed. Enter at the close of that candle, stop just below the level, target the next resistance above.
+  </div>
+  <div class="legend" id="legend">
+    <div class="leg"><div class="leg-dot" style="background:#0F6E56"></div>Support level</div>
+    <div class="leg"><div class="leg-dot" style="background:#534AB7"></div>Entry point</div>
+    <div class="leg"><div class="leg-dot" style="background:#A32D2D"></div>Stop loss</div>
+    <div class="leg"><div class="leg-dot" style="background:#854F0B"></div>Target</div>
+  </div>
+</div>
+<script>
+  var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var TEXT = dark ? '#c2c0b6' : '#3d3d3a';
+  var MUTED = dark ? '#555' : '#bbb';
+  var BG = dark ? '#181818' : '#fafaf8';
+  var BORDER = dark ? '#2e2e2e' : '#e0e0dc';
+  var GREEN = '#0F6E56'; var GREEN_L = dark ? '#04342C' : '#E1F5EE';
+  var RED = '#A32D2D'; var RED_L = dark ? '#2e1010' : '#FCEBEB';
+  var PURPLE = '#534AB7'; var PURPLE_L = dark ? '#26215C' : '#EEEDFE';
+  var AMBER = '#854F0B'; var AMBER_L = dark ? '#412402' : '#FAEEDA';
+  var BW = 26;
+
+  function el(tag, attrs) {
+    var e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    Object.keys(attrs).forEach(function(k) { e.setAttribute(k, attrs[k]); });
+    return e;
+  }
+  function txt(svg, x, y, t, size, fill, anchor) {
+    var e = el('text', { x:x, y:y, 'font-family':'-apple-system,sans-serif', 'font-size':size||11, fill:fill||TEXT, 'text-anchor':anchor||'start', 'dominant-baseline':'central' });
+    e.textContent = t; svg.appendChild(e);
+  }
+  function candle(svg, x, o, c, h, l) {
+    var bull = c <= o; var col = bull ? GREEN : RED; var fill = bull ? GREEN_L : RED_L;
+    var top = Math.min(o,c), bot = Math.max(o,c);
+    svg.appendChild(el('line',{x1:x+BW/2,y1:h,x2:x+BW/2,y2:top,stroke:col,'stroke-width':1.5,'stroke-linecap':'round'}));
+    svg.appendChild(el('line',{x1:x+BW/2,y1:bot,x2:x+BW/2,y2:l,stroke:col,'stroke-width':1.5,'stroke-linecap':'round'}));
+    svg.appendChild(el('rect',{x:x,y:top,width:BW,height:Math.max(bot-top,3),fill:fill,stroke:col,'stroke-width':1,rx:2}));
+  }
+  function dashed(svg, y, x1, x2, col) {
+    svg.appendChild(el('line',{x1:x1,y1:y,x2:x2,y2:y,stroke:col,'stroke-width':1.5,'stroke-dasharray':'6 4'}));
+  }
+  function hline(svg, y, x1, x2, col, dash) {
+    var attrs = {x1:x1,y1:y,x2:x2,y2:y,stroke:col,'stroke-width':1,'stroke-dasharray': dash || '4 3'};
+    svg.appendChild(el('line', attrs));
+  }
+
+  function setView(mode, btn) {
+    document.querySelectorAll('button').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    var svg = document.getElementById('diagram');
+    while(svg.firstChild) svg.removeChild(svg.firstChild);
+    svg.appendChild(el('rect',{x:0,y:0,width:660,height:300,fill:BG,rx:6}));
+    svg.appendChild(el('rect',{x:1,y:1,width:658,height:298,fill:'none',stroke:BORDER,'stroke-width':0.75,rx:5}));
+
+    var callout = document.getElementById('callout');
+    var legend = document.getElementById('legend');
+
+    if (mode === 'bounce') {
+      var sup = 220;
+      dashed(svg, sup, 14, 646, GREEN);
+      txt(svg, 18, sup-12, 'Support zone', 11, GREEN);
+      var cs = [{x:20,o:195,c:175,h:165,l:205},{x:58,o:178,c:192,h:168,l:202},{x:96,o:190,c:175,h:165,l:205},{x:134,o:178,c:188,h:168,l:198},{x:172,o:185,c:172,h:162,l:202}];
+      cs.forEach(function(c){ candle(svg,c.x,c.o,c.c,c.h,c.l); });
+      candle(svg, 210, 175, 170, 162, 238);
+      svg.appendChild(el('rect',{x:210,y:163,width:BW,height:7,fill:RED_L,stroke:RED,'stroke-width':1,rx:2}));
+      svg.appendChild(el('line',{x1:210+BW/2,y1:163,x2:210+BW/2,y2:238,stroke:RED,'stroke-width':1.5,'stroke-linecap':'round'}));
+      svg.appendChild(el('line',{x1:210+BW/2,y1:170,x2:210+BW/2,y2:163,stroke:RED,'stroke-width':1.5,'stroke-linecap':'round'}));
+      txt(svg, 210+BW/2, 148, 'Rejection candle', 11, RED, 'middle');
+      var cs2 = [{x:248,o:172,c:158,h:148,l:175},{x:286,o:160,c:145,h:135,l:165},{x:324,o:148,c:132,h:122,l:152},{x:362,o:135,c:118,h:108,l:138},{x:400,o:120,c:105,h:95,l:122}];
+      cs2.forEach(function(c){ candle(svg,c.x,c.o,c.c,c.h,c.l); });
+      hline(svg, 170, 236, 480, RED, '4 3');
+      hline(svg, 95, 236, 480, AMBER, '4 3');
+      txt(svg, 484, 170, 'Stop', 11, RED);
+      txt(svg, 484, 95, 'Target', 11, AMBER);
+      svg.appendChild(el('circle',{cx:248+BW/2,cy:158,r:6,fill:PURPLE,opacity:0.9}));
+      txt(svg, 248+BW/2, 145, 'Entry', 10, PURPLE, 'middle');
+      txt(svg, 330, 288, 'Time  →', 10, MUTED, 'middle');
+      callout.style.borderLeftColor = GREEN;
+      callout.innerHTML = '<strong>Bounce trade</strong>Price approaches support and shows a rejection candle with a long lower wick — sellers tried to push through but failed. Enter at the close of that candle, stop just below the level, target the next resistance above.';
+      legend.innerHTML = '<div class="leg"><div class="leg-dot" style="background:#0F6E56"></div>Support</div><div class="leg"><div class="leg-dot" style="background:#534AB7"></div>Entry</div><div class="leg"><div class="leg-dot" style="background:#A32D2D"></div>Stop loss</div><div class="leg"><div class="leg-dot" style="background:#854F0B"></div>Target</div>';
+    }
+
+    if (mode === 'breakout') {
+      var res = 120;
+      dashed(svg, res, 14, 646, PURPLE);
+      txt(svg, 18, res-12, 'Resistance zone', 11, PURPLE);
+      var cs = [{x:20,o:185,c:165,h:155,l:195},{x:58,o:168,c:152,h:142,l:175},{x:96,o:155,c:140,h:130,l:162},{x:134,o:142,c:128,h:118,l:148},{x:172,o:130,c:115,h:105,l:132}];
+      cs.forEach(function(c){ candle(svg,c.x,c.o,c.c,c.h,c.l); });
+      candle(svg, 210, 118, 100, 90, 125);
+      txt(svg, 210+BW/2, 78, 'Breakout candle', 11, GREEN, 'middle');
+      var cs2 = [{x:248,o:102,c:88,h:78,l:108},{x:286,o:90,c:75,h:65,l:92},{x:324,o:78,c:62,h:52,l:80},{x:362,o:65,c:50,h:40,l:68},{x:400,o:52,c:38,h:28,l:55}];
+      cs2.forEach(function(c){ candle(svg,c.x,c.o,c.c,c.h,c.l); });
+      hline(svg, 132, 236, 480, RED, '4 3');
+      hline(svg, 40, 236, 480, AMBER, '4 3');
+      txt(svg, 484, 132, 'Stop', 11, RED);
+      txt(svg, 484, 40, 'Target', 11, AMBER);
+      svg.appendChild(el('circle',{cx:248+BW/2,cy:88,r:6,fill:PURPLE,opacity:0.9}));
+      txt(svg, 248+BW/2, 75, 'Entry', 10, PURPLE, 'middle');
+      txt(svg, 330, 288, 'Time  →', 10, MUTED, 'middle');
+      callout.style.borderLeftColor = PURPLE;
+      callout.innerHTML = '<strong>Breakout trade</strong>Price closes with a full candle body beyond resistance on elevated volume. Enter at the open of the next candle, stop back below the broken level (it should now act as support), target the next S&R above.';
+      legend.innerHTML = '<div class="leg"><div class="leg-dot" style="background:#534AB7"></div>Resistance</div><div class="leg"><div class="leg-dot" style="background:#534AB7"></div>Entry</div><div class="leg"><div class="leg-dot" style="background:#A32D2D"></div>Stop loss</div><div class="leg"><div class="leg-dot" style="background:#854F0B"></div>Target</div>';
+    }
+
+    if (mode === 'fakeout') {
+      var res = 120;
+      dashed(svg, res, 14, 646, PURPLE);
+      txt(svg, 18, res-12, 'Resistance zone', 11, PURPLE);
+      var cs = [{x:20,o:185,c:165,h:155,l:195},{x:58,o:168,c:152,h:142,l:175},{x:96,o:155,c:140,h:130,l:162},{x:134,o:142,c:128,h:118,l:148},{x:172,o:130,c:115,h:105,l:132}];
+      cs.forEach(function(c){ candle(svg,c.x,c.o,c.c,c.h,c.l); });
+      svg.appendChild(el('line',{x1:210+BW/2,y1:105,x2:210+BW/2,y2:90,stroke:RED,'stroke-width':1.5,'stroke-linecap':'round'}));
+      svg.appendChild(el('line',{x1:210+BW/2,y1:128,x2:210+BW/2,y2:138,stroke:RED,'stroke-width':1.5,'stroke-linecap':'round'}));
+      svg.appendChild(el('rect',{x:210,y:105,width:BW,height:23,fill:RED_L,stroke:RED,'stroke-width':1,rx:2}));
+      txt(svg, 210+BW/2, 76, 'Wick through,', 11, RED, 'middle');
+      txt(svg, 210+BW/2, 90, 'body stays below', 11, RED, 'middle');
+      var cs2 = [{x:248,o:128,c:145,h:135,l:152},{x:286,o:142,c:160,h:150,l:168},{x:324,o:158,c:175,h:165,l:182},{x:362,o:172,c:190,h:180,l:198},{x:400,o:188,c:205,h:195,l:212}];
+      cs2.forEach(function(c){ candle(svg,c.x,c.o,c.c,c.h,c.l); });
+      txt(svg, 330, 248, 'Price reverses — fakeout traders are trapped', 11, RED, 'middle');
+      txt(svg, 330, 288, 'Time  →', 10, MUTED, 'middle');
+      callout.style.borderLeftColor = RED;
+      callout.innerHTML = '<strong>Fakeout — what to avoid</strong>The wick pierces resistance but the candle BODY closes back below the level. This is a fakeout. Breakout traders who entered get trapped as price reverses. Always wait for a full candle body close beyond the level before entering a breakout trade.';
+      legend.innerHTML = '<div class="leg"><div class="leg-dot" style="background:#534AB7"></div>Resistance</div><div class="leg"><div class="leg-dot" style="background:#A32D2D"></div>Fakeout candle</div><div class="leg"><div class="leg-dot" style="background:#0F6E56"></div>Reversal candles</div>';
+    }
+  }
+  setView('bounce', document.querySelector('button.active'));
+</script>
+</body>
+</html>

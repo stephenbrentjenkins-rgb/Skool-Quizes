@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 5 Quiz — Trading S&R Levels</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; background: #fff; color: #1a1a1a; padding: 32px 24px; max-width: 720px; margin: 0 auto; line-height: 1.6; }
+  h2 { font-size: 20px; font-weight: 500; margin-bottom: 4px; }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 28px; }
+  .q-block { margin-bottom: 32px; }
+  .q-num { font-size: 11px; font-weight: 500; color: #999; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 6px; }
+  .q-text { font-size: 15px; font-weight: 500; color: #1a1a1a; margin-bottom: 14px; line-height: 1.5; }
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .opt { display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px; border-radius: 8px; border: 1px solid #e0e0e0; cursor: pointer; font-size: 14px; color: #111; line-height: 1.5; background: #fff; transition: background .1s; -webkit-user-select: none; user-select: none; }
+  .opt:hover { background: #f5f5f5; }
+  .opt.correct { border-color: #0F6E56; background: #E1F5EE; color: #085041; }
+  .opt.wrong { border-color: #A32D2D; background: #FCEBEB; color: #501313; }
+  .opt.reveal-correct { border-color: #0F6E56; background: #E1F5EE; color: #085041; }
+  .opt-letter { font-weight: 500; min-width: 18px; flex-shrink: 0; }
+  .feedback { font-size: 13px; margin-top: 8px; padding: 10px 14px; border-radius: 8px; line-height: 1.6; display: none; }
+  .feedback.show { display: block; }
+  .feedback.correct { background: #E1F5EE; color: #085041; }
+  .feedback.wrong { background: #FCEBEB; color: #501313; }
+  hr { border: none; border-top: 1px solid #eee; margin: 28px 0; }
+  .score-block { display: none; margin-top: 32px; padding: 24px; border-radius: 12px; border: 1px solid #e0e0e0; text-align: center; }
+  .score-block.show { display: block; }
+  .score-num { font-size: 40px; font-weight: 500; color: #1a1a1a; margin-bottom: 8px; }
+  .score-label { font-size: 14px; color: #666; }
+  .reset-btn { margin-top: 18px; padding: 8px 22px; border-radius: 8px; border: 1px solid #d0d0d0; background: #f5f5f5; color: #1a1a1a; cursor: pointer; font-size: 14px; font-family: inherit; transition: background .1s; }
+  .reset-btn:hover { background: #ebebeb; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #141414; color: #e8e6e0; }
+    .q-text { color: #e8e6e0; }
+    .opt { background: #1e1e1e; border-color: #2e2e2e; color: #e8e6e0; }
+    .opt:hover { background: #252525; }
+    .opt.correct { background: #04342C; border-color: #0F6E56; color: #9FE1CB; }
+    .opt.wrong { background: #2e1010; border-color: #A32D2D; color: #f09595; }
+    .opt.reveal-correct { background: #04342C; border-color: #0F6E56; color: #9FE1CB; }
+    .feedback.correct { background: #04342C; color: #9FE1CB; }
+    .feedback.wrong { background: #2e1010; color: #f09595; }
+    hr { border-color: #2a2a2a; }
+    .score-block { border-color: #2e2e2e; }
+    .score-num { color: #e8e6e0; }
+    .score-label { color: #888; }
+    .reset-btn { background: #1e1e1e; color: #e8e6e0; border-color: #3a3a3a; }
+    .reset-btn:hover { background: #2a2a2a; }
+    .subtitle { color: #666; }
+  }
+</style>
+</head>
+<body>
+<h2>Lesson 5 Knowledge Check</h2>
+<p class="subtitle">Trading S&amp;R levels — bounces &amp; breakouts — 5 questions</p>
+
+<div class="q-block" id="q1">
+  <div class="q-num">Question 1 of 5</div>
+  <div class="q-text">In a bounce trade, what is your confirmation signal before entering?</div>
+  <div class="options">
+    <div class="opt"><span class="opt-letter">A</span>Price has been at the support level for three or more days</div>
+    <div class="opt"><span class="opt-letter">B</span>A rejection candle — typically with a long wick into the level but a close back on the correct side</div>
+    <div class="opt"><span class="opt-letter">C</span>The stock appears on a trending news feed</div>
+    <div class="opt"><span class="opt-letter">D</span>Volume drops significantly as price approaches the level</div>
+  </div>
+  <div class="feedback correct" id="q1-c">Correct. The rejection candle — especially one with a long wick — shows that price tested the level and was rejected. It's evidence that buyers (at support) or sellers (at resistance) are defending the level. That's your entry signal.</div>
+  <div class="feedback wrong" id="q1-w">The confirmation you're looking for is a rejection candle — ideally with a long wick into the level and a close back on the correct side. This shows the level is holding and traders are defending it.</div>
+</div>
+
+<hr>
+
+<div class="q-block" id="q2">
+  <div class="q-num">Question 2 of 5</div>
+  <div class="q-text">Where should your stop loss be placed on a bounce trade from support?</div>
+  <div class="options">
+    <div class="opt"><span class="opt-letter">A</span>At the exact support level price bounced from</div>
+    <div class="opt"><span class="opt-letter">B</span>At the previous resistance level above</div>
+    <div class="opt"><span class="opt-letter">C</span>Just below the support zone — if price breaks convincingly through, the bounce has failed</div>
+    <div class="opt"><span class="opt-letter">D</span>At a fixed 5% below your entry price</div>
+  </div>
+  <div class="feedback correct" id="q2-c">Exactly right. Placing your stop just below the support zone means: if price breaks convincingly through your support level, you're out immediately. The level has failed. A small planned loss beats a large unplanned one.</div>
+  <div class="feedback wrong" id="q2-w">Your stop goes just below the support zone. If price breaks convincingly below support, the setup has failed and you want to be out. Placing it exactly at the level risks getting stopped out by normal price volatility within the zone.</div>
+</div>
+
+<hr>
+
+<div class="q-block" id="q3">
+  <div class="q-num">Question 3 of 5</div>
+  <div class="q-text">What is the key difference between a genuine breakout and a fakeout?</div>
+  <div class="options">
+    <div class="opt"><span class="opt-letter">A</span>Genuine breakouts always happen on Mondays; fakeouts happen later in the week</div>
+    <div class="opt"><span class="opt-letter">B</span>A genuine breakout has a full candle body closing beyond the level, often on elevated volume. A fakeout only has a wick through the level with the body closing back inside.</div>
+    <div class="opt"><span class="opt-letter">C</span>Fakeouts only happen on small-cap stocks; genuine breakouts only happen on large-caps</div>
+    <div class="opt"><span class="opt-letter">D</span>A genuine breakout means price never returns to the level again</div>
+  </div>
+  <div class="feedback correct" id="q3-c">Spot on. The body of the candle tells the real story. A wick through a level with the body closing back inside means sellers (at resistance) or buyers (at support) ultimately won that period — it's a fakeout signal. A full body close beyond the level is genuine momentum.</div>
+  <div class="feedback wrong" id="q3-w">The key is where the candle BODY closes, not just where the wick reaches. A wick through the level with a body close back inside = fakeout. A full candle body closing beyond the level, ideally on elevated volume = genuine breakout.</div>
+</div>
+
+<hr>
+
+<div class="q-block" id="q4">
+  <div class="q-num">Question 4 of 5</div>
+  <div class="q-text">You're considering a breakout trade. The candle has just closed above resistance. When do you enter?</div>
+  <div class="options">
+    <div class="opt"><span class="opt-letter">A</span>The moment price crosses above the resistance line mid-candle</div>
+    <div class="opt"><span class="opt-letter">B</span>After waiting three days to confirm the breakout is real</div>
+    <div class="opt"><span class="opt-letter">C</span>At the open of the next candle after the breakout candle has closed</div>
+    <div class="opt"><span class="opt-letter">D</span>Only after price has pulled back and retested the broken resistance level</div>
+  </div>
+  <div class="feedback correct" id="q4-c">Correct. Waiting for the candle to close gives you confirmation before committing. Entering mid-candle is risky — the candle could reverse and close back below the level (a fakeout). The open of the next candle is your entry.</div>
+  <div class="feedback wrong" id="q4-w">Never enter mid-candle on a breakout. Wait for the breakout candle to fully close beyond the level, then enter at the open of the following candle. This simple rule significantly reduces your exposure to fakeouts.</div>
+</div>
+
+<hr>
+
+<div class="q-block" id="q5">
+  <div class="q-num">Question 5 of 5</div>
+  <div class="q-text">Your entry is at $50, your stop is at $48, and your target is at $54. Should you take this trade?</div>
+  <div class="options">
+    <div class="opt"><span class="opt-letter">A</span>Yes — any trade with a profit target is worth taking</div>
+    <div class="opt"><span class="opt-letter">B</span>No — the risk-to-reward ratio is only 2:1, which is the minimum but acceptable</div>
+    <div class="opt"><span class="opt-letter">C</span>Yes — the risk is $2 and the reward is $4, giving a 2:1 ratio which meets the minimum threshold</div>
+    <div class="opt"><span class="opt-letter">D</span>No — you need at least a 5:1 ratio to take any trade</div>
+  </div>
+  <div class="feedback correct" id="q5-c">Correct. Risk = $2 (entry $50 minus stop $48), Reward = $4 (target $54 minus entry $50). That's a 2:1 ratio — exactly the minimum. This trade meets the threshold. A higher ratio would be better, but 2:1 is acceptable.</div>
+  <div class="feedback wrong" id="q5-w">Let's work it out: risk = $50 - $48 = $2. Reward = $54 - $50 = $4. That gives a 2:1 reward-to-risk ratio — the minimum threshold. The trade is acceptable. Any ratio below 2:1 and you should pass on the setup.</div>
+</div>
+
+<div class="score-block" id="score">
+  <div class="score-num" id="score-num">0/5</div>
+  <div class="score-label" id="score-label"></div>
+  <button class="reset-btn" onclick="resetQuiz()">Retake quiz</button>
+</div>
+
+<script>
+  var correctIndex = { q1:1, q2:2, q3:1, q4:2, q5:2 };
+  var answered = {};
+  function init() {
+    Object.keys(correctIndex).forEach(function(qid) {
+      var opts = document.querySelectorAll('#'+qid+' .opt');
+      opts.forEach(function(opt, i) { opt.addEventListener('click', function(){ answer(qid,opt,i===correctIndex[qid]); }); });
+    });
+  }
+  function answer(qid, el, correct) {
+    if (answered[qid] !== undefined) return;
+    answered[qid] = correct;
+    var opts = document.querySelectorAll('#'+qid+' .opt');
+    opts.forEach(function(o){ o.style.pointerEvents='none'; });
+    if (correct) { el.classList.add('correct'); document.getElementById(qid+'-c').classList.add('show'); }
+    else { el.classList.add('wrong'); opts[correctIndex[qid]].classList.add('reveal-correct'); document.getElementById(qid+'-w').classList.add('show'); }
+    if (Object.keys(answered).length===5) showScore();
+  }
+  function showScore() {
+    var score = Object.values(answered).filter(Boolean).length;
+    document.getElementById('score-num').textContent = score+'/5';
+    var labels = ['Keep reviewing — rewatch the video before moving on.','Good effort — revisit the questions you missed.','Solid understanding — you\'re ready to practise on real charts.','Great work — the setups are clicking!','Perfect score — on to Lesson 6!'];
+    document.getElementById('score-label').textContent = labels[score];
+    document.getElementById('score').classList.add('show');
+  }
+  function resetQuiz() {
+    Object.keys(answered).forEach(function(k){ delete answered[k]; });
+    document.querySelectorAll('.opt').forEach(function(o){ o.className='opt'; o.style.pointerEvents=''; });
+    document.querySelectorAll('.feedback').forEach(function(f){ f.classList.remove('show'); });
+    document.getElementById('score').classList.remove('show');
+    init();
+  }
+  init();
+</script>
+</body>
+</html>
