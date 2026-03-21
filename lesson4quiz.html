@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 4 Quiz — Role Reversal</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: #ffffff; color: #1a1a1a;
+    padding: 32px 24px; max-width: 720px; margin: 0 auto; line-height: 1.6;
+  }
+  h2 { font-size: 20px; font-weight: 500; margin-bottom: 4px; }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 28px; }
+  .q-block { margin-bottom: 32px; }
+  .q-num { font-size: 11px; font-weight: 500; color: #999; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 6px; }
+  .q-text { font-size: 15px; font-weight: 500; color: #1a1a1a; margin-bottom: 14px; line-height: 1.5; }
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .opt {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 14px; border-radius: 8px; border: 1px solid #e0e0e0;
+    cursor: pointer; font-size: 14px; color: #111111; line-height: 1.5;
+    background: #fff; transition: background 0.1s;
+    -webkit-user-select: none; user-select: none;
+  }
+  .opt:hover { background: #f5f5f5; }
+  .opt.correct { border-color: #0F6E56; background: #E1F5EE; color: #085041; }
+  .opt.wrong { border-color: #A32D2D; background: #FCEBEB; color: #501313; }
+  .opt.reveal-correct { border-color: #0F6E56; background: #E1F5EE; color: #085041; }
+  .opt-letter { font-weight: 500; min-width: 18px; flex-shrink: 0; }
+  .feedback { font-size: 13px; margin-top: 8px; padding: 10px 14px; border-radius: 8px; line-height: 1.6; display: none; }
+  .feedback.show { display: block; }
+  .feedback.correct { background: #E1F5EE; color: #085041; }
+  .feedback.wrong { background: #FCEBEB; color: #501313; }
+  hr { border: none; border-top: 1px solid #eeeeee; margin: 28px 0; }
+  .score-block { display: none; margin-top: 32px; padding: 24px; border-radius: 12px; border: 1px solid #e0e0e0; text-align: center; }
+  .score-block.show { display: block; }
+  .score-num { font-size: 40px; font-weight: 500; color: #1a1a1a; margin-bottom: 8px; }
+  .score-label { font-size: 14px; color: #666; }
+  .reset-btn { margin-top: 18px; padding: 8px 22px; border-radius: 8px; border: 1px solid #d0d0d0; background: #f5f5f5; color: #1a1a1a; cursor: pointer; font-size: 14px; font-family: inherit; transition: background 0.1s; }
+  .reset-btn:hover { background: #ebebeb; }
+
+  @media (prefers-color-scheme: dark) {
+    body { background: #141414; color: #e8e6e0; }
+    .q-text { color: #e8e6e0; }
+    .opt { background: #1e1e1e; border-color: #2e2e2e; color: #e8e6e0; }
+    .opt:hover { background: #252525; }
+    .opt.correct { background: #04342C; border-color: #0F6E56; color: #9FE1CB; }
+    .opt.wrong { background: #2e1010; border-color: #A32D2D; color: #f09595; }
+    .opt.reveal-correct { background: #04342C; border-color: #0F6E56; color: #9FE1CB; }
+    .feedback.correct { background: #04342C; color: #9FE1CB; }
+    .feedback.wrong { background: #2e1010; color: #f09595; }
+    hr { border-color: #2a2a2a; }
+    .score-block { border-color: #2e2e2e; }
+    .score-num { color: #e8e6e0; }
+    .score-label { color: #888; }
+    .reset-btn { background: #1e1e1e; color: #e8e6e0; border-color: #3a3a3a; }
+    .reset-btn:hover { background: #2a2a2a; }
+    .subtitle { color: #666; }
+  }
+</style>
+</head>
+<body>
+
+<h2>Lesson 4 Knowledge Check</h2>
+<p class="subtitle">Role reversal — when support becomes resistance — 5 questions</p>
+
+<div class="q-block" id="q1">
+  <div class="q-num">Question 1 of 5</div>
+  <div class="q-text">What is "role reversal" in technical analysis?</div>
+  <div class="options">
+    <div class="opt"><span class="opt-letter">A</span>When a stock switches from a growth stock to a value stock</div>
+    <div class="opt"><span class="opt-letter">B</span>When a support level becomes resistance (or resistance becomes support) after price breaks through it</div>
+    <div class="opt"><span class="opt-letter">C</span>When buyers and sellers swap their positions in a trade</div>
+    <div class="opt"><span class="opt-letter">D</span>When the trend changes direction from up to down</div>
+  </div>
+  <div class="feedback correct" id="q1-c">Exactly right. Role reversal is when a level switches its function — a support level that gets broken then acts as resistance on the way back up, and vice versa.</div>
+  <div class="feedback wrong" id="q1-w">Role reversal refers specifically to S&R levels switching their function. When price breaks through a support level, that level often becomes resistance — and when resistance breaks, it often becomes support.</div>
+</div>
+
+<hr>
+
+<div class="q-block" id="q2">
+  <div class="q-num">Question 2 of 5</div>
+  <div class="q-text">Why does a broken support level often become resistance when price returns to it?</div>
+  <div class="options">
+    <div class="opt"><span class="opt-letter">A</span>Because the stock exchange marks it as a resistance level in their system</div>
+    <div class="opt"><span class="opt-letter">B</span>Because traders who bought at the support level are now in a losing trade and want to sell when price returns to their entry</div>
+    <div class="opt"><span class="opt-letter">C</span>Because market makers deliberately push price back down at that level</div>
+    <div class="opt"><span class="opt-letter">D</span>Because support levels always become resistance after exactly 30 days</div>
+  </div>
+  <div class="feedback correct" id="q2-c">Correct. Traders who bought at the old support are now sitting on a loss. When price returns to their entry level, many of them sell to cut their losses or exit at breakeven — creating selling pressure that turns the level into resistance.</div>
+  <div class="feedback wrong" id="q2-w">It's about trader psychology. Buyers who got trapped at the support level are in losing positions. When price comes back to that level, they sell to exit — and that collective selling pressure turns the old floor into a ceiling.</div>
+</div>
+
+<hr>
+
+<div class="q-block" id="q3">
+  <div class="q-num">Question 3 of 5</div>
+  <div class="q-text">Price breaks above a resistance level at $80, rallies to $95, then pulls back. What do you expect to happen when price reaches $80 again?</div>
+  <div class="options">
+    <div class="opt"><span class="opt-letter">A</span>Price will automatically drop back below $80 as the old resistance reasserts itself</div>
+    <div class="opt"><span class="opt-letter">B</span>The $80 level is now irrelevant and should be ignored</div>
+    <div class="opt"><span class="opt-letter">C</span>The $80 level may now act as support — buyers stepping in where sellers previously were</div>
+    <div class="opt"><span class="opt-letter">D</span>Price will gap through $80 without any reaction</div>
+  </div>
+  <div class="feedback correct" id="q3-c">Correct. Old resistance at $80 becomes potential new support. Traders who missed the initial breakout may look to buy on the pullback to $80 — and short sellers who were wrong may close their positions there, adding buying pressure.</div>
+  <div class="feedback wrong" id="q3-w">When resistance breaks and price pulls back to that level, it often acts as new support. Buyers who missed the breakout see the pullback as an opportunity, and trapped short sellers close positions there — both creating buying pressure at $80.</div>
+</div>
+
+<hr>
+
+<div class="q-block" id="q4">
+  <div class="q-num">Question 4 of 5</div>
+  <div class="q-text">Which of these is the best confirmation that a role reversal has occurred?</div>
+  <div class="options">
+    <div class="opt"><span class="opt-letter">A</span>Price briefly dips below support by one or two cents before recovering</div>
+    <div class="opt"><span class="opt-letter">B</span>A convincing break through the level, a meaningful move away, then a retest that respects the level in its new role</div>
+    <div class="opt"><span class="opt-letter">C</span>The stock's trading volume doubles on the day of the break</div>
+    <div class="opt"><span class="opt-letter">D</span>The level has been in place for more than six months</div>
+  </div>
+  <div class="feedback correct" id="q4-c">Spot on. A true role reversal requires three things: a convincing break (not a fakeout), a meaningful move away from the level, and then a retest where price respects the level in its new role — stalling and reversing at that point.</div>
+  <div class="feedback wrong" id="q4-w">A brief dip below support that immediately recovers is a fakeout, not a break. True role reversal confirmation needs: a convincing break, a significant move away, and then a retest where the level holds in its new role.</div>
+</div>
+
+<hr>
+
+<div class="q-block" id="q5">
+  <div class="q-num">Question 5 of 5</div>
+  <div class="q-text">Using the floor-and-ceiling analogy: if you fall through the floor of a building, what does the floor become from your new perspective below?</div>
+  <div class="options">
+    <div class="opt"><span class="opt-letter">A</span>It becomes the ground — no longer relevant</div>
+    <div class="opt"><span class="opt-letter">B</span>It stays a floor — nothing changes</div>
+    <div class="opt"><span class="opt-letter">C</span>It becomes the ceiling — the same surface now acts as a barrier above you</div>
+    <div class="opt"><span class="opt-letter">D</span>It becomes a wall — the level now blocks sideways movement</div>
+  </div>
+  <div class="feedback correct" id="q5-c">Perfect. The floor from above is the ceiling from below — same surface, completely different role depending on which side of it you're on. That's exactly how role reversal works on a price chart.</div>
+  <div class="feedback wrong" id="q5-w">The correct answer is ceiling. Once you fall through the floor, that same surface is now above you — it's become your ceiling. On a price chart: fall through support, and that level is now resistance above price. Same surface, new role.</div>
+</div>
+
+<div class="score-block" id="score">
+  <div class="score-num" id="score-num">0/5</div>
+  <div class="score-label" id="score-label"></div>
+  <button class="reset-btn" onclick="resetQuiz()">Retake quiz</button>
+</div>
+
+<script>
+  var correctIndex = { q1: 1, q2: 1, q3: 2, q4: 1, q5: 2 };
+  var answered = {};
+
+  function init() {
+    Object.keys(correctIndex).forEach(function(qid) {
+      var opts = document.querySelectorAll('#' + qid + ' .opt');
+      opts.forEach(function(opt, i) {
+        opt.addEventListener('click', function() { answer(qid, opt, i === correctIndex[qid]); });
+      });
+    });
+  }
+
+  function answer(qid, el, correct) {
+    if (answered[qid] !== undefined) return;
+    answered[qid] = correct;
+    var opts = document.querySelectorAll('#' + qid + ' .opt');
+    opts.forEach(function(o) { o.style.pointerEvents = 'none'; });
+    if (correct) {
+      el.classList.add('correct');
+      document.getElementById(qid + '-c').classList.add('show');
+    } else {
+      el.classList.add('wrong');
+      opts[correctIndex[qid]].classList.add('reveal-correct');
+      document.getElementById(qid + '-w').classList.add('show');
+    }
+    if (Object.keys(answered).length === 5) showScore();
+  }
+
+  function showScore() {
+    var score = Object.values(answered).filter(Boolean).length;
+    document.getElementById('score-num').textContent = score + '/5';
+    var labels = [
+      'Keep reviewing — rewatch the video and try again!',
+      'Good effort — check the questions you missed.',
+      'Solid grasp — the concept is clicking.',
+      'Great work — you understand role reversal well!',
+      'Perfect score — on to Lesson 5!'
+    ];
+    document.getElementById('score-label').textContent = labels[score];
+    document.getElementById('score').classList.add('show');
+  }
+
+  function resetQuiz() {
+    Object.keys(answered).forEach(function(k) { delete answered[k]; });
+    document.querySelectorAll('.opt').forEach(function(o) { o.className = 'opt'; o.style.pointerEvents = ''; });
+    document.querySelectorAll('.feedback').forEach(function(f) { f.classList.remove('show'); });
+    document.getElementById('score').classList.remove('show');
+    init();
+  }
+
+  init();
+</script>
+</body>
+</html>
