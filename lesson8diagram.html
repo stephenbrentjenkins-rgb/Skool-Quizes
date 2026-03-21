@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 8 — The S&R Trading Playbook</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; background: #f9f9f7; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 32px 16px; }
+  .card { background: #fff; border-radius: 16px; border: 1px solid #e8e8e4; padding: 28px 28px 24px; max-width: 720px; width: 100%; }
+  .lesson-tag { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .07em; color: #999; margin-bottom: 6px; }
+  h1 { font-size: 20px; font-weight: 500; color: #1a1a1a; margin-bottom: 4px; }
+  .subtitle { font-size: 13px; color: #999; margin-bottom: 20px; }
+  .controls { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  button { font-size: 13px; font-family: inherit; padding: 6px 16px; border-radius: 20px; border: 1px solid #ddd; background: #f5f5f3; color: #444; cursor: pointer; transition: all .15s; }
+  button:hover { background: #ececea; border-color: #ccc; }
+  button.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+  .panel { display: none; }
+  .panel.show { display: block; }
+  .step-row { display: flex; gap: 14px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
+  .step-row:last-child { border: none; }
+  .step-num { font-size: 12px; font-weight: 500; width: 24px; height: 24px; border-radius: 50%; background: #1a1a1a; color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .step-content { flex: 1; }
+  .step-title { font-size: 14px; font-weight: 500; color: #1a1a1a; margin-bottom: 4px; }
+  .step-desc { font-size: 13px; color: #666; line-height: 1.65; }
+  .field { margin-bottom: 14px; }
+  label { display: block; font-size: 12px; font-weight: 500; color: #666; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+  input, select, textarea { width: 100%; padding: 9px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; font-family: inherit; color: #1a1a1a; background: #fff; }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: #999; }
+  textarea { resize: vertical; min-height: 70px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .result-box { background: #f5f5f3; border-radius: 10px; padding: 16px; margin-top: 16px; }
+  .result-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #e8e8e4; font-size: 13px; }
+  .result-row:last-child { border: none; }
+  .result-label { color: #666; }
+  .result-val { font-weight: 500; color: #1a1a1a; }
+  .result-val.good { color: #0F6E56; }
+  .result-val.bad { color: #A32D2D; }
+  .verdict { margin-top: 12px; padding: 12px 14px; border-radius: 8px; font-size: 13px; line-height: 1.6; }
+  .verdict.good { background: #E1F5EE; color: #085041; }
+  .verdict.warn { background: #FAEEDA; color: #633806; }
+  .verdict.bad { background: #FCEBEB; color: #501313; }
+  .journal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+  .print-btn { margin-top: 16px; padding: 8px 18px; border-radius: 8px; border: 1px solid #0F6E56; background: #E1F5EE; color: #085041; cursor: pointer; font-size: 13px; font-family: inherit; font-weight: 500; }
+  .print-btn:hover { background: #9FE1CB; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #141414; }
+    .card { background: #1e1e1e; border-color: #2e2e2e; }
+    h1 { color: #e8e6e0; }
+    .subtitle, .lesson-tag { color: #666; }
+    button { background: #2a2a2a; color: #c2c0b6; border-color: #3a3a3a; }
+    button:hover { background: #333; }
+    button.active { background: #e8e6e0; color: #1a1a1a; }
+    .step-title { color: #e8e6e0; }
+    .step-desc { color: #888; }
+    .step-row { border-color: #2a2a2a; }
+    label { color: #888; }
+    input, select, textarea { background: #252525; border-color: #3a3a3a; color: #e8e6e0; }
+    input:focus, select:focus, textarea:focus { border-color: #666; }
+    .result-box { background: #252525; }
+    .result-row { border-color: #333; }
+    .result-label { color: #888; }
+    .result-val { color: #e8e6e0; }
+    .print-btn { background: #04342C; color: #9FE1CB; border-color: #0F6E56; }
+    .print-btn:hover { background: #085041; }
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="lesson-tag">Lesson 8 · Capstone</div>
+  <h1>Your S&amp;R trading playbook</h1>
+  <p class="subtitle">Use these interactive tools in your daily trading routine</p>
+
+  <div class="controls">
+    <button class="active" onclick="show('scan',this)">Daily scan</button>
+    <button onclick="show('plan',this)">Trade plan</button>
+    <button onclick="show('journal',this)">Trade journal</button>
+    <button onclick="show('mistakes',this)">Mistakes to avoid</button>
+  </div>
+
+  <div class="panel show" id="panel-scan">
+    <div class="step-row">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <div class="step-title">Build your watchlist (20–30 stocks)</div>
+        <div class="step-desc">Choose stocks you know well. Familiarity matters — you need to recognise when a chart is approaching a significant level, not discover it for the first time under pressure.</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <div class="step-title">Scan every morning (15 minutes)</div>
+        <div class="step-desc">Before the market opens, go through your list. Ask: is price approaching a key S&amp;R level? Is there confluence (RSI, MA, volume)? Is the R:R at least 2:1? Three yesses = goes on your active radar.</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <div class="step-title">Set alerts for active setups</div>
+        <div class="step-desc">On TradingView, set a price alert just above your S&amp;R level. When price approaches, you get notified and check for your confirmation signal. You don't need to watch screens all day.</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <div class="step-title">Quality over quantity</div>
+        <div class="step-desc">One high-conviction setup per week is better than five marginal ones. Most weeks you may not find anything that meets all criteria. That patience is not weakness — it's discipline.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-plan">
+    <div class="field-row">
+      <div class="field"><label>Ticker / stock</label><input type="text" id="p-ticker" placeholder="e.g. AAPL" oninput="calcPlan()"></div>
+      <div class="field"><label>Setup type</label>
+        <select id="p-setup" onchange="calcPlan()">
+          <option value="bounce">Bounce trade</option>
+          <option value="breakout">Breakout trade</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Entry price ($)</label><input type="number" id="p-entry" placeholder="52.00" step="0.01" oninput="calcPlan()"></div>
+      <div class="field"><label>Stop loss ($)</label><input type="number" id="p-stop" placeholder="49.00" step="0.01" oninput="calcPlan()"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Target price ($)</label><input type="number" id="p-target" placeholder="61.00" step="0.01" oninput="calcPlan()"></div>
+      <div class="field"><label>Account size ($)</label><input type="number" id="p-account" placeholder="10000" step="100" oninput="calcPlan()"></div>
+    </div>
+    <div class="field"><label>Confluence signals noted</label><textarea id="p-conf" placeholder="e.g. RSI at 32, price at 3-touch support, 50 MA nearby" oninput="calcPlan()"></textarea></div>
+    <div class="result-box" id="plan-result"><div style="color:#999;font-size:13px">Fill in the fields above to generate your trade plan.</div></div>
+  </div>
+
+  <div class="panel" id="panel-journal">
+    <div class="journal-grid">
+      <div class="field"><label>Date</label><input type="date" id="j-date"></div>
+      <div class="field"><label>Ticker</label><input type="text" id="j-ticker" placeholder="AAPL"></div>
+      <div class="field"><label>Setup</label>
+        <select id="j-setup">
+          <option>Bounce — long</option>
+          <option>Bounce — short</option>
+          <option>Breakout — long</option>
+          <option>Breakout — short</option>
+        </select>
+      </div>
+      <div class="field"><label>Outcome</label>
+        <select id="j-outcome">
+          <option value="win">Win</option>
+          <option value="loss">Loss</option>
+          <option value="scratch">Scratch (breakeven)</option>
+        </select>
+      </div>
+      <div class="field"><label>Entry ($)</label><input type="number" id="j-entry" step="0.01"></div>
+      <div class="field"><label>Exit ($)</label><input type="number" id="j-exit" step="0.01"></div>
+      <div class="field"><label>Stop ($)</label><input type="number" id="j-stop" step="0.01"></div>
+      <div class="field"><label>Shares</label><input type="number" id="j-shares" step="1"></div>
+    </div>
+    <div class="field"><label>What went well?</label><textarea id="j-well" placeholder="Setup was clean, waited for confirmation candle, sized correctly..."></textarea></div>
+    <div class="field"><label>What could I improve?</label><textarea id="j-improve" placeholder="Entered slightly late, could have been more patient on the entry..."></textarea></div>
+    <button class="print-btn" onclick="saveJournal()">Save this entry</button>
+    <div id="journal-saved" style="margin-top:12px;font-size:13px;color:#0F6E56;display:none">Entry saved. Keep going — consistency compounds.</div>
+  </div>
+
+  <div class="panel" id="panel-mistakes">
+    <div class="step-row">
+      <div class="step-num" style="background:#A32D2D">1</div>
+      <div class="step-content">
+        <div class="step-title">Drawing too many levels</div>
+        <div class="step-desc">If your chart is covered in horizontal lines, start over. Two or three well-tested, obvious levels. More lines equals more confusion, not more edge.</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num" style="background:#A32D2D">2</div>
+      <div class="step-content">
+        <div class="step-title">Treating levels as exact prices</div>
+        <div class="step-desc">Support at $50 means the zone around $50 — not $50.00 precisely. Draw zones, not lines. Price will poke through by a few cents before reversing. That's normal — your stop should account for it.</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num" style="background:#A32D2D">3</div>
+      <div class="step-content">
+        <div class="step-title">Chasing trades</div>
+        <div class="step-desc">Missed the entry? Let it go. Entering late destroys your risk-to-reward ratio and teaches your brain that impulsive trades are acceptable. There will always be another setup.</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num" style="background:#A32D2D">4</div>
+      <div class="step-content">
+        <div class="step-title">Fighting the trend</div>
+        <div class="step-desc">Always check the 50 MA before entering. Trading in the direction of the trend significantly increases your win rate. Counter-trend trades require more skill and experience — save them for later.</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num" style="background:#A32D2D">5</div>
+      <div class="step-content">
+        <div class="step-title">Skipping the trade plan</div>
+        <div class="step-desc">Every single trade. Written out before you enter. No exceptions. A plan keeps you honest, prevents emotional decisions, and gives you something concrete to review in your journal.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function show(id, btn) {
+    document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('show'); });
+    document.getElementById('panel-'+id).classList.add('show');
+    document.querySelectorAll('.controls button').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+  }
+
+  function calcPlan() {
+    var ticker = document.getElementById('p-ticker').value || '—';
+    var setup = document.getElementById('p-setup').value;
+    var entry = parseFloat(document.getElementById('p-entry').value);
+    var stop = parseFloat(document.getElementById('p-stop').value);
+    var target = parseFloat(document.getElementById('p-target').value);
+    var account = parseFloat(document.getElementById('p-account').value);
+    var conf = document.getElementById('p-conf').value;
+    var box = document.getElementById('plan-result');
+    if (!entry || !stop || !target) { box.innerHTML = '<div style="color:#999;font-size:13px">Fill in entry, stop, and target to generate your plan.</div>'; return; }
+    var risk = Math.abs(entry - stop);
+    var reward = Math.abs(target - entry);
+    var ratio = (reward / risk);
+    var maxRisk = account ? (account * 0.02) : null;
+    var shares = maxRisk ? Math.floor(maxRisk / risk) : null;
+    var rClass = ratio >= 3 ? 'good' : ratio >= 2 ? '' : 'bad';
+    var verdict = ratio >= 3 ? 'Strong setup — R:R exceeds 3:1. High conviction entry.' : ratio >= 2 ? 'Acceptable setup — R:R meets the 2:1 minimum.' : 'Do not enter — R:R is below the 2:1 minimum. Wait for a better setup.';
+    var vClass = ratio >= 3 ? 'good' : ratio >= 2 ? 'warn' : 'bad';
+    var html = '<div class="result-row"><span class="result-label">Stock</span><span class="result-val">'+ticker+' — '+(setup==='bounce'?'Bounce trade':'Breakout trade')+'</span></div>';
+    html += '<div class="result-row"><span class="result-label">Entry</span><span class="result-val">$'+entry.toFixed(2)+'</span></div>';
+    html += '<div class="result-row"><span class="result-label">Stop loss</span><span class="result-val bad">$'+stop.toFixed(2)+' (−$'+risk.toFixed(2)+' per share)</span></div>';
+    html += '<div class="result-row"><span class="result-label">Target</span><span class="result-val good">$'+target.toFixed(2)+' (+$'+reward.toFixed(2)+' per share)</span></div>';
+    html += '<div class="result-row"><span class="result-label">R:R ratio</span><span class="result-val '+rClass+'">'+ratio.toFixed(2)+':1</span></div>';
+    if (shares) html += '<div class="result-row"><span class="result-label">Position size (2% rule)</span><span class="result-val good">'+shares+' shares (max $'+Math.round(maxRisk)+' risk)</span></div>';
+    if (conf) html += '<div class="result-row"><span class="result-label">Confluence</span><span class="result-val">'+conf+'</span></div>';
+    html += '<div class="verdict '+vClass+'">'+verdict+'</div>';
+    box.innerHTML = html;
+  }
+
+  function saveJournal() {
+    document.getElementById('journal-saved').style.display = 'block';
+    setTimeout(function(){ document.getElementById('journal-saved').style.display = 'none'; }, 4000);
+  }
+</script>
+</body>
+</html>
