@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 7 — Risk Management Calculator</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; background: #f9f9f7; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 32px 16px; }
+  .card { background: #fff; border-radius: 16px; border: 1px solid #e8e8e4; padding: 28px 28px 24px; max-width: 720px; width: 100%; }
+  .lesson-tag { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .07em; color: #999; margin-bottom: 6px; }
+  h1 { font-size: 20px; font-weight: 500; color: #1a1a1a; margin-bottom: 4px; }
+  .subtitle { font-size: 13px; color: #999; margin-bottom: 24px; }
+  .controls { display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; }
+  button { font-size: 13px; font-family: inherit; padding: 6px 16px; border-radius: 20px; border: 1px solid #ddd; background: #f5f5f3; color: #444; cursor: pointer; transition: all .15s; }
+  button:hover { background: #ececea; border-color: #ccc; }
+  button.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+  .panel { display: none; }
+  .panel.show { display: block; }
+  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  label { font-size: 12px; font-weight: 500; color: #666; text-transform: uppercase; letter-spacing: .05em; }
+  input[type="number"] { padding: 9px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; font-family: inherit; color: #1a1a1a; background: #fff; width: 100%; -moz-appearance: textfield; }
+  input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+  input[type="number"]:focus { outline: none; border-color: #999; }
+  .results { background: #f5f5f3; border-radius: 10px; padding: 18px; }
+  .result-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #e8e8e4; font-size: 14px; }
+  .result-row:last-child { border: none; padding-bottom: 0; }
+  .result-label { color: #666; }
+  .result-val { font-weight: 500; font-size: 15px; color: #1a1a1a; }
+  .result-val.good { color: #0F6E56; }
+  .result-val.warn { color: #854F0B; }
+  .result-val.bad { color: #A32D2D; }
+  .verdict { margin-top: 14px; padding: 12px 16px; border-radius: 8px; font-size: 13px; line-height: 1.65; font-weight: 500; }
+  .verdict.good { background: #E1F5EE; color: #085041; }
+  .verdict.warn { background: #FAEEDA; color: #633806; }
+  .verdict.bad { background: #FCEBEB; color: #501313; }
+  .sr-diagram { margin-bottom: 20px; }
+  svg { display: block; width: 100%; }
+  .info-box { background: #f5f5f3; border-radius: 10px; padding: 16px 18px; font-size: 13px; color: #555; line-height: 1.75; }
+  .info-box strong { color: #1a1a1a; display: block; margin-bottom: 5px; font-size: 14px; }
+
+  @media (prefers-color-scheme: dark) {
+    body { background: #141414; }
+    .card { background: #1e1e1e; border-color: #2e2e2e; }
+    h1 { color: #e8e6e0; }
+    .subtitle, .lesson-tag { color: #666; }
+    label { color: #888; }
+    button { background: #2a2a2a; color: #c2c0b6; border-color: #3a3a3a; }
+    button:hover { background: #333; }
+    button.active { background: #e8e6e0; color: #1a1a1a; }
+    input[type="number"] { background: #252525; border-color: #3a3a3a; color: #e8e6e0; }
+    input[type="number"]:focus { border-color: #666; }
+    .results { background: #252525; }
+    .result-row { border-color: #333; }
+    .result-label { color: #888; }
+    .result-val { color: #e8e6e0; }
+    .info-box { background: #252525; color: #a0a09a; }
+    .info-box strong { color: #e8e6e0; }
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="lesson-tag">Lesson 7 · Mastery</div>
+  <h1>Risk management calculator</h1>
+  <p class="subtitle">Use the tabs to explore each concept — then try the live calculator</p>
+
+  <div class="controls">
+    <button class="active" onclick="showPanel('rr', this)">Risk-to-reward</button>
+    <button onclick="showPanel('size', this)">Position sizing</button>
+    <button onclick="showPanel('stop', this)">Stop placement</button>
+  </div>
+
+  <div class="panel show" id="panel-rr">
+    <div class="field-grid">
+      <div class="field"><label>Entry price ($)</label><input type="number" id="rr-entry" value="52" step="0.01" oninput="calcRR()"></div>
+      <div class="field"><label>Stop loss ($)</label><input type="number" id="rr-stop" value="49" step="0.01" oninput="calcRR()"></div>
+      <div class="field"><label>Target price ($)</label><input type="number" id="rr-target" value="61" step="0.01" oninput="calcRR()"></div>
+      <div class="field"><label>Trade direction</label>
+        <select id="rr-dir" onchange="calcRR()" style="padding:9px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;font-family:inherit;background:#fff;color:#1a1a1a">
+          <option value="long">Long (buy)</option>
+          <option value="short">Short (sell)</option>
+        </select>
+      </div>
+    </div>
+    <div class="results" id="rr-results"></div>
+  </div>
+
+  <div class="panel" id="panel-size">
+    <div class="field-grid">
+      <div class="field"><label>Account size ($)</label><input type="number" id="sz-account" value="10000" step="100" oninput="calcSize()"></div>
+      <div class="field"><label>Risk per trade (%)</label><input type="number" id="sz-pct" value="2" step="0.5" min="0.1" max="10" oninput="calcSize()"></div>
+      <div class="field"><label>Entry price ($)</label><input type="number" id="sz-entry" value="52" step="0.01" oninput="calcSize()"></div>
+      <div class="field"><label>Stop loss ($)</label><input type="number" id="sz-stop" value="49" step="0.01" oninput="calcSize()"></div>
+    </div>
+    <div class="results" id="sz-results"></div>
+  </div>
+
+  <div class="panel" id="panel-stop">
+    <div class="sr-diagram">
+      <svg viewBox="0 0 660 260" xmlns="http://www.w3.org/2000/svg" id="stop-svg"></svg>
+    </div>
+    <div class="info-box" id="stop-info">
+      <strong>Where to place your stop loss</strong>
+      For a bounce trade at support: place your stop just below the support zone — not right at the level. Price often pokes briefly through before bouncing. Give it breathing room. If price closes convincingly below your support zone, the trade has failed and you want out automatically.
+    </div>
+    <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+      <button onclick="showStop('bounce')" id="stop-btn-bounce" class="active" style="border-radius:8px">Bounce stop</button>
+      <button onclick="showStop('breakout')" id="stop-btn-breakout" style="border-radius:8px">Breakout stop</button>
+      <button onclick="showStop('trail')" id="stop-btn-trail" style="border-radius:8px">Trailing stop</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var TEXT = dark ? '#c2c0b6' : '#3d3d3a';
+  var MUTED = dark ? '#555' : '#bbb';
+  var BG_CHART = dark ? '#1a1a1a' : '#fafaf8';
+  var BORDER = dark ? '#2e2e2e' : '#e0e0dc';
+  var GREEN = '#0F6E56'; var GREEN_L = dark ? '#04342C' : '#E1F5EE';
+  var RED = '#A32D2D'; var RED_L = dark ? '#2e1010' : '#FCEBEB';
+  var AMBER = '#854F0B';
+  var BW = 24;
+
+  function showPanel(id, btn) {
+    document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('show'); });
+    document.getElementById('panel-'+id).classList.add('show');
+    document.querySelectorAll('.controls button').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    if (id === 'stop') { showStop('bounce'); }
+  }
+
+  function calcRR() {
+    var entry = parseFloat(document.getElementById('rr-entry').value) || 0;
+    var stop = parseFloat(document.getElementById('rr-stop').value) || 0;
+    var target = parseFloat(document.getElementById('rr-target').value) || 0;
+    var dir = document.getElementById('rr-dir').value;
+    if (!entry || !stop || !target) return;
+    var risk, reward;
+    if (dir === 'long') { risk = entry - stop; reward = target - entry; }
+    else { risk = stop - entry; reward = entry - target; }
+    if (risk <= 0 || reward <= 0) {
+      document.getElementById('rr-results').innerHTML = '<div class="result-row"><span class="result-label">Error</span><span class="result-val bad">Check your prices match the trade direction</span></div>';
+      return;
+    }
+    var ratio = (reward / risk).toFixed(2);
+    var rClass = ratio >= 3 ? 'good' : ratio >= 2 ? 'warn' : 'bad';
+    var verdict = ratio >= 3 ? 'Strong setup — excellent risk-to-reward.' : ratio >= 2 ? 'Acceptable setup — meets the minimum 2:1 threshold.' : 'Skip this trade — ratio is below the 2:1 minimum.';
+    var vClass = ratio >= 3 ? 'good' : ratio >= 2 ? 'warn' : 'bad';
+    document.getElementById('rr-results').innerHTML =
+      '<div class="result-row"><span class="result-label">Risk per share</span><span class="result-val bad">-$'+risk.toFixed(2)+'</span></div>' +
+      '<div class="result-row"><span class="result-label">Reward per share</span><span class="result-val good">+$'+reward.toFixed(2)+'</span></div>' +
+      '<div class="result-row"><span class="result-label">Risk-to-reward ratio</span><span class="result-val '+rClass+'">'+ratio+':1</span></div>' +
+      '<div class="verdict '+vClass+'">'+verdict+'</div>';
+  }
+
+  function calcSize() {
+    var account = parseFloat(document.getElementById('sz-account').value) || 0;
+    var pct = parseFloat(document.getElementById('sz-pct').value) || 0;
+    var entry = parseFloat(document.getElementById('sz-entry').value) || 0;
+    var stop = parseFloat(document.getElementById('sz-stop').value) || 0;
+    if (!account || !pct || !entry || !stop) return;
+    var maxRisk = (account * pct / 100);
+    var riskPerShare = Math.abs(entry - stop);
+    if (riskPerShare <= 0) return;
+    var shares = Math.floor(maxRisk / riskPerShare);
+    var totalValue = (shares * entry).toFixed(2);
+    var pctOfAccount = ((shares * entry / account) * 100).toFixed(1);
+    var pClass = pct <= 2 ? 'good' : pct <= 3 ? 'warn' : 'bad';
+    document.getElementById('sz-results').innerHTML =
+      '<div class="result-row"><span class="result-label">Max risk ($)</span><span class="result-val bad">$'+maxRisk.toFixed(2)+'</span></div>' +
+      '<div class="result-row"><span class="result-label">Risk per share</span><span class="result-val">$'+riskPerShare.toFixed(2)+'</span></div>' +
+      '<div class="result-row"><span class="result-label">Max shares to buy</span><span class="result-val '+pClass+'">'+shares+' shares</span></div>' +
+      '<div class="result-row"><span class="result-label">Total position value</span><span class="result-val">$'+parseFloat(totalValue).toLocaleString()+'</span></div>' +
+      '<div class="result-row"><span class="result-label">% of account deployed</span><span class="result-val">'+pctOfAccount+'%</span></div>' +
+      '<div class="verdict good">Formula: $'+maxRisk.toFixed(0)+' max risk ÷ $'+riskPerShare.toFixed(2)+' per share = '+shares+' shares</div>';
+  }
+
+  function el(tag, attrs) {
+    var e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    Object.keys(attrs).forEach(function(k){ e.setAttribute(k, attrs[k]); });
+    return e;
+  }
+  function txt(svg, x, y, t, size, fill, anchor) {
+    var e = el('text',{x:x,y:y,'font-family':'-apple-system,sans-serif','font-size':size||11,fill:fill||TEXT,'text-anchor':anchor||'start','dominant-baseline':'central'});
+    e.textContent = t; svg.appendChild(e);
+  }
+  function candle(svg, x, o, c, h, l) {
+    var bull = c<=o; var col=bull?GREEN:RED; var fill=bull?GREEN_L:RED_L;
+    var top=Math.min(o,c),bot=Math.max(o,c);
+    svg.appendChild(el('line',{x1:x+BW/2,y1:h,x2:x+BW/2,y2:top,stroke:col,'stroke-width':1.5,'stroke-linecap':'round'}));
+    svg.appendChild(el('line',{x1:x+BW/2,y1:bot,x2:x+BW/2,y2:l,stroke:col,'stroke-width':1.5,'stroke-linecap':'round'}));
+    svg.appendChild(el('rect',{x:x,y:top,width:BW,height:Math.max(bot-top,3),fill:fill,stroke:col,'stroke-width':1,rx:2}));
+  }
+
+  function showStop(mode) {
+    document.querySelectorAll('[id^="stop-btn-"]').forEach(function(b){ b.classList.remove('active'); });
+    document.getElementById('stop-btn-'+mode).classList.add('active');
+    var svg = document.getElementById('stop-svg');
+    while(svg.firstChild) svg.removeChild(svg.firstChild);
+    svg.appendChild(el('rect',{x:0,y:0,width:660,height:260,fill:BG_CHART,rx:6}));
+    svg.appendChild(el('rect',{x:1,y:1,width:658,height:258,fill:'none',stroke:BORDER,'stroke-width':0.75,rx:5}));
+
+    if (mode === 'bounce') {
+      var sup = 185;
+      svg.appendChild(el('rect',{x:14,y:sup-8,width:632,height:16,fill:GREEN_L,rx:3,opacity:0.8}));
+      svg.appendChild(el('line',{x1:14,y1:sup,x2:646,y2:sup,stroke:GREEN,'stroke-width':1.5,'stroke-dasharray':'6 4'}));
+      txt(svg,18,sup-18,'Support zone',11,GREEN);
+      var cs=[{x:20,o:155,c:140,h:130,l:165},{x:54,o:142,c:155,h:132,l:162},{x:88,o:152,c:138,h:128,l:162},{x:122,o:140,c:153,h:130,l:160},{x:156,o:150,c:138,h:128,l:158}];
+      cs.forEach(function(c){candle(svg,c.x,c.o,c.c,c.h,c.l);});
+      svg.appendChild(el('line',{x1:190+BW/2,y1:135,x2:190+BW/2,y2:200,stroke:RED,'stroke-width':1.5,'stroke-linecap':'round'}));
+      svg.appendChild(el('rect',{x:190,y:135,width:BW,height:12,fill:RED_L,stroke:RED,'stroke-width':1,rx:2}));
+      var cs2=[{x:224,o:148,c:132,h:122,l:155},{x:258,o:135,c:118,h:108,l:138},{x:292,o:120,c:105,h:95,l:122}];
+      cs2.forEach(function(c){candle(svg,c.x,c.o,c.c,c.h,c.l);});
+      svg.appendChild(el('line',{x1:14,y1:210,x2:646,y2:210,stroke:RED,'stroke-width':1.5,'stroke-dasharray':'4 3'}));
+      txt(svg,18,222,'Stop loss — just below support zone',11,RED);
+      txt(svg,330,248,'Time  →',10,MUTED,'middle');
+      document.getElementById('stop-info').innerHTML = '<strong>Bounce trade stop — just below support</strong>Place your stop just below the support zone, not right at the level. Price often pokes briefly through before bouncing — a stop right at the line can get triggered by normal volatility. The slight buffer separates a genuine break from a temporary dip.';
+    }
+
+    if (mode === 'breakout') {
+      var res = 100;
+      svg.appendChild(el('rect',{x:14,y:res-8,width:632,height:16,fill:'#EEEDFE',rx:3,opacity:0.8}));
+      svg.appendChild(el('line',{x1:14,y1:res,x2:646,y2:res,stroke:'#534AB7','stroke-width':1.5,'stroke-dasharray':'6 4'}));
+      txt(svg,18,res-18,'Resistance zone',11,'#534AB7');
+      var cs=[{x:20,o:155,c:138,h:128,l:165},{x:54,o:140,c:152,h:130,l:160},{x:88,o:150,c:136,h:126,l:158},{x:122,o:138,c:150,h:128,l:158},{x:156,o:148,c:134,h:124,l:156}];
+      cs.forEach(function(c){candle(svg,c.x,c.o,c.c,c.h,c.l);});
+      candle(svg,190,136,100,90,142);
+      var cs2=[{x:224,o:102,c:88,h:78,l:108},{x:258,o:90,c:75,h:65,l:92},{x:292,o:78,c:62,h:52,l:80}];
+      cs2.forEach(function(c){candle(svg,c.x,c.o,c.c,c.h,c.l);});
+      svg.appendChild(el('line',{x1:14,y1:115,x2:646,y2:115,stroke:RED,'stroke-width':1.5,'stroke-dasharray':'4 3'}));
+      txt(svg,18,127,'Stop loss — back below broken level',11,RED);
+      txt(svg,330,248,'Time  →',10,MUTED,'middle');
+      document.getElementById('stop-info').innerHTML = '<strong>Breakout trade stop — below broken level</strong>After a breakout above resistance, the broken level should now act as support. Your stop goes just below it. If price falls back below the broken level, the breakout has failed — that\'s your signal to exit.';
+    }
+
+    if (mode === 'trail') {
+      var cs=[
+        {x:20,o:220,c:200,h:190,l:228},{x:54,o:202,c:182,h:172,l:210},
+        {x:88,o:184,c:162,h:152,l:192},{x:122,o:164,c:144,h:134,l:172},
+        {x:156,o:146,c:125,h:115,l:154},{x:190,o:128,c:108,h:98,l:136},
+        {x:224,o:110,c:88,h:78,l:118},{x:258,o:92,c:72,h:62,l:100},
+        {x:292,o:75,c:55,h:45,l:82}
+      ];
+      cs.forEach(function(c){candle(svg,c.x,c.o,c.c,c.h,c.l);});
+      var stops=[230,212,194,176,158,140,122,104,88];
+      stops.forEach(function(s,i){
+        var x=cs[i].x;
+        svg.appendChild(el('circle',{cx:x+BW/2,cy:s,r:3.5,fill:AMBER,opacity:0.9}));
+        if(i>0){ svg.appendChild(el('line',{x1:cs[i-1].x+BW/2,y1:stops[i-1],x2:x+BW/2,y2:s,stroke:AMBER,'stroke-width':1,'stroke-dasharray':'3 2',opacity:0.6})); }
+      });
+      txt(svg,330,248,'Time  →',10,MUTED,'middle');
+      txt(svg,18,240,'Trailing stop follows price lower →',11,AMBER);
+      document.getElementById('stop-info').innerHTML = '<strong>Trailing stop — lock in profits as price moves</strong>As price moves in your favour, move your stop in the same direction. Each amber dot shows the stop moving lower with each swing low in this downtrend. This ensures you capture the bulk of the move while protecting against a full reversal.';
+    }
+  }
+
+  calcRR();
+  calcSize();
+  showStop('bounce');
+</script>
+</body>
+</html>
