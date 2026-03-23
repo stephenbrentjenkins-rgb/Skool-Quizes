@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Texas LLC + Trust Planner (Homeowner + 401k)</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;500;700&family=Syne+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0e0c;
+    --surface: #1a1916;
+    --surface2: #232119;
+    --border: #2e2c27;
+    --border2: #3d3b34;
+    --gold: #c9a84c;
+    --gold-dim: #7a6530;
+    --cream: #e8e2d4;
+    --muted: #7a7568;
+    --green: #4a8c6a;
+    --green-dim: #2a4e3c;
+    --blue: #4a7aac;
+    --blue-dim: #2a4466;
+    --amber: #c08030;
+    --red: #c05040;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--cream);
+    min-height: 100vh;
+  }
+
+  header {
+    padding: 56px 48px 40px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    top: -120px; right: -120px;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(201,168,76,0.06) 0%, transparent 70%);
+  }
+
+  .header-tag {
+    font-family: 'Syne Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 14px;
+  }
+
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 400;
+    line-height: 1.15;
+    color: var(--cream);
+    margin-bottom: 12px;
+  }
+
+  header h1 em { font-style: italic; color: var(--gold); }
+
+  header p {
+    font-size: 14px;
+    color: var(--muted);
+    max-width: 560px;
+    line-height: 1.7;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    min-height: calc(100vh - 180px);
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 40px 32px;
+    position: sticky;
+    top: 0;
+    height: fit-content;
+  }
+
+  .sidebar-title {
+    font-family: 'Syne Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 28px;
+  }
+
+  .slider-group { margin-bottom: 28px; }
+
+  .slider-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+  }
+
+  .slider-name { font-size: 13px; font-weight: 500; color: var(--cream); }
+
+  .slider-value {
+    font-family: 'Syne Mono', monospace;
+    font-size: 15px;
+    color: var(--gold);
+  }
+
+  .slider-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 9px;
+    font-family: 'Syne Mono', monospace;
+  }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 2px;
+    background: var(--border2);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--gold);
+    cursor: pointer;
+    border: 3px solid var(--surface);
+    box-shadow: 0 0 0 1px var(--gold);
+    transition: transform 0.15s;
+  }
+
+  input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+  input[type="range"].green-slider::-webkit-slider-thumb  { background: #4a8c6a; box-shadow: 0 0 0 1px #4a8c6a; }
+  input[type="range"].blue-slider::-webkit-slider-thumb   { background: #4a7aac; box-shadow: 0 0 0 1px #4a7aac; }
+  input[type="range"].purple-slider::-webkit-slider-thumb { background: #c084e0; box-shadow: 0 0 0 1px #c084e0; }
+
+  .divider { height: 1px; background: var(--border); margin: 24px 0; }
+
+  .totals {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+  }
+
+  .total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+
+  .total-row:last-child { border-bottom: none; }
+  .total-label { color: var(--muted); }
+
+  .total-val {
+    font-family: 'Syne Mono', monospace;
+    font-size: 13px;
+    color: var(--cream);
+  }
+
+  .total-val.gold  { color: var(--gold); }
+  .total-val.green { color: #6abf8a; }
+  .total-val.red   { color: #e07060; }
+  .total-val.blue  { color: #7aaad4; }
+  .total-val.purple{ color: #c084e0; }
+
+  /* ── Content ── */
+  .content { padding: 40px 48px; }
+
+  .rec-banner {
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 32px;
+    border: 1px solid;
+    transition: all 0.3s;
+  }
+
+  .rec-banner.recommend-scorp { background: rgba(74,140,106,0.08); border-color: var(--green-dim); }
+  .rec-banner.recommend-dis   { background: rgba(74,122,172,0.08); border-color: var(--blue-dim); }
+
+  .rec-tag {
+    font-family: 'Syne Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .rec-banner.recommend-scorp .rec-tag { color: #6abf8a; }
+  .rec-banner.recommend-dis   .rec-tag { color: #7aaad4; }
+  .rec-text { font-size: 14px; line-height: 1.7; color: var(--cream); }
+  .rec-text strong { color: var(--gold); }
+
+  .steps-title {
+    font-family: 'Syne Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .steps-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .step-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 22px;
+    margin-bottom: 14px;
+    transition: border-color 0.2s;
+  }
+
+  .step-card:hover { border-color: var(--border2); }
+
+  .step-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+
+  .step-left { display: flex; align-items: flex-start; gap: 14px; }
+
+  .step-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 30px;
+    font-weight: 400;
+    line-height: 1;
+    min-width: 28px;
+  }
+
+  .step-info h3 { font-size: 15px; font-weight: 700; color: var(--cream); margin-bottom: 3px; }
+  .step-info p  { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+  .step-badge {
+    font-family: 'Syne Mono', monospace;
+    font-size: 10px;
+    padding: 4px 11px;
+    border-radius: 20px;
+    white-space: nowrap;
+    border: 1px solid;
+    flex-shrink: 0;
+  }
+
+  .badge-gold   { color: var(--gold);  border-color: var(--gold-dim);  background: rgba(201,168,76,0.06); }
+  .badge-green  { color: #6abf8a;      border-color: var(--green-dim); background: rgba(74,140,106,0.06); }
+  .badge-blue   { color: #7aaad4;      border-color: var(--blue-dim);  background: rgba(74,122,172,0.06); }
+  .badge-amber  { color: #daa050;      border-color: #5a4010;          background: rgba(192,128,48,0.06); }
+  .badge-purple { color: #c084e0;      border-color: #5a2a7a;          background: rgba(192,132,224,0.06); }
+
+  .step-bullets { list-style: none; display: flex; flex-direction: column; gap: 6px; padding-top: 12px; border-top: 1px solid var(--border); }
+
+  .step-bullets li {
+    font-size: 13px;
+    color: var(--muted);
+    padding-left: 18px;
+    position: relative;
+    line-height: 1.6;
+  }
+
+  .step-bullets li::before {
+    content: '·';
+    position: absolute;
+    left: 6px;
+    color: var(--gold);
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  .step-bullets li strong { color: var(--cream); font-weight: 500; }
+
+  /* Asset grid */
+  .alloc-grid {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .alloc-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+
+  .alloc-label {
+    font-family: 'Syne Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .alloc-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: var(--gold);
+    margin-bottom: 3px;
+  }
+
+  .alloc-vehicle { font-size: 11px; color: var(--muted); }
+
+  /* Tax table */
+  .tax-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 14px;
+  }
+
+  .tax-card-header {
+    padding: 14px 22px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .tax-card-title { font-size: 13px; font-weight: 700; }
+
+  .tax-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+  .tax-table th {
+    padding: 9px 18px;
+    text-align: left;
+    font-family: 'Syne Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 400;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tax-table td { padding: 11px 18px; border-bottom: 1px solid var(--border); color: var(--cream); }
+  .tax-table tr:last-child td { border-bottom: none; background: rgba(201,168,76,0.04); }
+  .tax-table .mono    { font-family: 'Syne Mono', monospace; }
+  .tax-table .red-val { color: #e07060; }
+  .tax-table .gold-val{ color: var(--gold); font-weight: 700; }
+  .tax-table .purple  { color: #c084e0; }
+
+  /* Cost card */
+  .cost-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+
+  .cost-row-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 22px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .cost-row-item:last-child {
+    border-bottom: none;
+    background: rgba(201,168,76,0.06);
+    padding: 15px 22px;
+  }
+
+  .cost-row-label { color: var(--muted); }
+  .cost-row-amt   { font-family: 'Syne Mono', monospace; font-size: 13px; color: var(--cream); }
+  .cost-row-item:last-child .cost-row-label { font-size: 14px; font-weight: 700; color: var(--cream); }
+  .cost-row-item:last-child .cost-row-amt   { font-size: 17px; color: var(--gold); }
+
+  /* Priority */
+  .priority-list { display: flex; flex-direction: column; gap: 9px; }
+
+  .priority-item {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 18px;
+  }
+
+  .p-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    color: var(--border2);
+    line-height: 1;
+    min-width: 24px;
+  }
+
+  .p-text strong { display: block; font-size: 13px; font-weight: 700; color: var(--cream); margin-bottom: 2px; }
+  .p-text span   { font-size: 11px; color: var(--muted); font-family: 'Syne Mono', monospace; }
+
+  .disclaimer {
+    margin-top: 48px;
+    padding: 20px 24px;
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.7;
+    text-align: center;
+  }
+
+  section { margin-bottom: 44px; }
+
+  @media (max-width: 768px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { position: static; border-right: none; border-bottom: 1px solid var(--border); }
+    .content { padding: 32px 24px; }
+    header   { padding: 40px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-tag">Texas LLC + Trust Asset Protection Planner · Homeowner + 401(k)</div>
+  <h1>Texas LLC + Trust <em>Strategy</em></h1>
+  <p>Built for Texas homeowners with a brokerage and Solo 401(k). Adjust all four sliders in $5,000 increments and every figure — taxes, 401(k) limits, costs, and recommendations — updates in real time.</p>
+</header>
+
+<div class="layout">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+    <div class="sidebar-title">Your numbers</div>
+
+    <div class="slider-group">
+      <div class="slider-label">
+        <span class="slider-name">Annual income</span>
+        <span class="slider-value" id="val-income">$75,000</span>
+      </div>
+      <div class="slider-sub">Active business / self-employment</div>
+      <input type="range" id="sl-income" min="5000" max="500000" step="5000" value="75000">
+    </div>
+
+    <div class="slider-group">
+      <div class="slider-label">
+        <span class="slider-name">Home value</span>
+        <span class="slider-value" id="val-home" style="color:#7aaad4">$250,000</span>
+      </div>
+      <div class="slider-sub">Held in revocable living trust</div>
+      <input type="range" class="blue-slider" id="sl-home" min="50000" max="2000000" step="5000" value="250000">
+    </div>
+
+    <div class="slider-group">
+      <div class="slider-label">
+        <span class="slider-name">Brokerage investments</span>
+        <span class="slider-value" id="val-broker" style="color:#6abf8a">$100,000</span>
+      </div>
+      <div class="slider-sub">Held directly in trust</div>
+      <input type="range" class="green-slider" id="sl-broker" min="0" max="1000000" step="5000" value="100000">
+    </div>
+
+    <div class="slider-group">
+      <div class="slider-label">
+        <span class="slider-name">401(k) balance</span>
+        <span class="slider-value" id="val-401k" style="color:#c084e0">$50,000</span>
+      </div>
+      <div class="slider-sub">Solo 401(k) · stays in your name</div>
+      <input type="range" class="purple-slider" id="sl-401k" min="0" max="1000000" step="5000" value="50000">
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="totals">
+      <div class="total-row">
+        <span class="total-label">Home value</span>
+        <span class="total-val blue" id="tot-home">$250,000</span>
+      </div>
+      <div class="total-row">
+        <span class="total-label">Brokerage</span>
+        <span class="total-val green" id="tot-broker">$100,000</span>
+      </div>
+      <div class="total-row">
+        <span class="total-label">401(k) balance</span>
+        <span class="total-val purple" id="tot-401k">$50,000</span>
+      </div>
+      <div class="total-row">
+        <span class="total-label">Total net worth tracked</span>
+        <span class="total-val gold" id="tot-assets">$400,000</span>
+      </div>
+      <div class="total-row">
+        <span class="total-label">Max 401(k) contribution</span>
+        <span class="total-val purple" id="tot-401k-contrib">—</span>
+      </div>
+      <div class="total-row">
+        <span class="total-label">SE tax (disregarded)</span>
+        <span class="total-val red" id="tot-se-dis">—</span>
+      </div>
+      <div class="total-row">
+        <span class="total-label">SE tax (S-Corp)</span>
+        <span class="total-val" id="tot-se-scorp">—</span>
+      </div>
+      <div class="total-row">
+        <span class="total-label">Est. annual tax savings</span>
+        <span class="total-val green" id="tot-savings">—</span>
+      </div>
+      <div class="total-row">
+        <span class="total-label">Recommended structure</span>
+        <span class="total-val gold" id="tot-rec">—</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── CONTENT ── -->
+  <main class="content">
+
+    <!-- Rec banner -->
+    <div class="rec-banner recommend-dis" id="rec-banner">
+      <div class="rec-tag" id="rec-tag">Tax recommendation</div>
+      <div class="rec-text" id="rec-text"></div>
+    </div>
+
+    <!-- Texas callout -->
+    <div style="border-radius:10px;padding:18px 22px;margin-bottom:36px;border:1px solid #5a3a10;background:rgba(192,128,48,0.06);">
+      <div style="font-family:'Syne Mono',monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#daa050;margin-bottom:12px;">Texas-specific advantages</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;">
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--cream);margin-bottom:3px;">No state income tax</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6;">LLC pass-through income is taxed federally only — zero Texas personal income tax.</div>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--cream);margin-bottom:3px;">Homestead exemption</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6;">Keep your home in the <em>revocable trust</em>, not the LLC — preserves your Texas homestead property tax exemption.</div>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--cream);margin-bottom:3px;">401(k) + LLC combo</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6;">Your LLC enables a Solo 401(k) with the highest contribution limits available to the self-employed.</div>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--cream);margin-bottom:3px;">Charging order protection</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6;">Texas BOC §101.112 shields LLC assets from creditors — they can only attach distributions, not the underlying assets.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Asset snapshot -->
+    <section>
+      <div class="steps-title">Your assets</div>
+      <div class="alloc-grid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="alloc-card">
+          <div class="alloc-label">Active income</div>
+          <div class="alloc-value" id="snap-income">$75,000</div>
+          <div class="alloc-vehicle">LLC → <span id="snap-vehicle">Disregarded entity</span></div>
+        </div>
+        <div class="alloc-card">
+          <div class="alloc-label">Home</div>
+          <div class="alloc-value" style="color:#7aaad4" id="snap-home">$250,000</div>
+          <div class="alloc-vehicle">Revocable trust · homestead kept</div>
+        </div>
+        <div class="alloc-card">
+          <div class="alloc-label">Brokerage</div>
+          <div class="alloc-value" style="color:#6abf8a" id="snap-broker">$100,000</div>
+          <div class="alloc-vehicle">Held in revocable trust</div>
+        </div>
+        <div class="alloc-card">
+          <div class="alloc-label">Solo 401(k)</div>
+          <div class="alloc-value" style="color:#c084e0" id="snap-401k">$50,000</div>
+          <div class="alloc-vehicle">Your name · ERISA protected</div>
+        </div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 18px;font-size:13px;color:var(--muted);line-height:1.7;">
+        <span style="color:#7aaad4;font-family:'Syne Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:5px;">Homeowner note</span>
+        Your home transfers into the revocable trust via warranty deed — <strong style="color:var(--cream);">not</strong> the LLC. This preserves your Texas homestead exemption (~$100k+ in property tax savings) and keeps your mortgage lender happy. The 401(k) stays in your personal name; ERISA already protects it federally.
+      </div>
+    </section>
+
+    <!-- Tax comparison -->
+    <section>
+      <div class="steps-title">Tax comparison</div>
+      <div class="tax-card">
+        <div class="tax-card-header">
+          <span class="tax-card-title">Disregarded entity vs. S-Corp at your income</span>
+          <span class="step-badge badge-gold" id="tax-badge">Evaluating…</span>
+        </div>
+        <table class="tax-table">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Disregarded entity</th>
+              <th>S-Corp election</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Net profit</td>
+              <td class="mono" id="tc-profit-dis">—</td>
+              <td class="mono" id="tc-profit-sc">—</td>
+            </tr>
+            <tr>
+              <td>Reasonable salary</td>
+              <td class="mono red-val">—</td>
+              <td class="mono" id="tc-salary">—</td>
+            </tr>
+            <tr>
+              <td>Distributions (no SE tax)</td>
+              <td class="mono red-val">—</td>
+              <td class="mono" id="tc-dist">—</td>
+            </tr>
+            <tr>
+              <td>Solo 401(k) max contribution</td>
+              <td class="mono purple" id="tc-401k-dis">—</td>
+              <td class="mono purple" id="tc-401k-sc">—</td>
+            </tr>
+            <tr>
+              <td>SE / payroll tax</td>
+              <td class="mono red-val" id="tc-se-dis">—</td>
+              <td class="mono" id="tc-se-sc">—</td>
+            </tr>
+            <tr>
+              <td>Compliance cost</td>
+              <td class="mono">$0</td>
+              <td class="mono red-val">~$2,500/yr</td>
+            </tr>
+            <tr>
+              <td><strong>Net annual savings</strong></td>
+              <td class="mono">—</td>
+              <td class="mono gold-val" id="tc-savings">—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Step-by-step -->
+    <section>
+      <div class="steps-title">Step-by-step plan</div>
+
+      <!-- Step 1: Trust -->
+      <div class="step-card">
+        <div class="step-top">
+          <div class="step-left">
+            <div class="step-num" style="color:var(--gold)">1</div>
+            <div class="step-info">
+              <h3>Create your revocable living trust</h3>
+              <p>The cornerstone of the whole structure. Owns your LLC, holds your home and brokerage, avoids probate on all assets — all while flowing transparently to your personal 1040.</p>
+            </div>
+          </div>
+          <span class="step-badge badge-gold">$1,000 – $2,500</span>
+        </div>
+        <ul class="step-bullets">
+          <li>Hire an estate planning attorney to draft the trust document</li>
+          <li>You are the <strong>grantor, trustee, and beneficiary</strong> — you retain full control during your lifetime</li>
+          <li>Name a <strong>successor trustee</strong> (spouse, adult child, or professional) to take over at incapacity or death</li>
+          <li>Because it's revocable, the IRS ignores it — all income flows straight to your <strong>Form 1040</strong></li>
+          <li>Avoids probate on your home, brokerage, and LLC interest — your heirs get assets without court involvement</li>
+        </ul>
+      </div>
+
+      <!-- Step 2: LLC -->
+      <div class="step-card">
+        <div class="step-top">
+          <div class="step-left">
+            <div class="step-num" style="color:#6abf8a">2</div>
+            <div class="step-info">
+              <h3>Form your LLC in Texas</h3>
+              <p>Direct Texas formation — no foreign registration needed. Solid charging order protection, zero state income tax, and the legal home for your business income.</p>
+            </div>
+          </div>
+          <span class="step-badge badge-green">~$450 setup</span>
+        </div>
+        <ul class="step-bullets">
+          <li>File a <strong>Certificate of Formation</strong> with the Texas Secretary of State — $300 fee</li>
+          <li>No foreign registration needed — you live and operate in Texas</li>
+          <li>Texas has <strong>no state income tax</strong> · franchise tax applies but most LLCs under ~$2.47M revenue owe $0</li>
+          <li>Draft an <strong>operating agreement</strong> naming your revocable trust as the sole member</li>
+          <li>Open a dedicated LLC bank account immediately — never mix personal and business funds</li>
+          <li>File annual <strong>Texas Franchise Tax Report</strong> by May 15 each year</li>
+        </ul>
+      </div>
+
+      <!-- Step 3: Asset transfers -->
+      <div class="step-card">
+        <div class="step-top">
+          <div class="step-left">
+            <div class="step-num" style="color:#7aaad4">3</div>
+            <div class="step-info">
+              <h3>Transfer assets into the structure</h3>
+              <p>Each asset has its own vehicle. The home and brokerage move into the trust; the LLC captures business income; the 401(k) stays put.</p>
+            </div>
+          </div>
+          <span class="step-badge badge-blue">$300 – $600</span>
+        </div>
+        <ul class="step-bullets">
+          <li><strong>Home (<span id="b-home">$250,000</span>) → Revocable trust</strong> via warranty deed · preserves Texas homestead exemption and property tax benefits · notify mortgage lender (Garn-St. Germain Act allows this) · update homeowner's insurance named insured</li>
+          <li><strong>Brokerage (<span id="b-broker">$100,000</span>) → Trust</strong> · contact your brokerage (Fidelity, Schwab, etc.) and request change of ownership · standard form, no sale, no tax event triggered</li>
+          <li><strong>Business income (<span id="b-income">$75,000</span>/yr) → LLC</strong> · all active income routes through the LLC · clients pay the LLC, not you personally · keep the LLC bank account strictly separate</li>
+          <li><strong>Solo 401(k) (<span id="b-401k">$50,000</span>) → stays in your name</strong> · ERISA already protects it federally from nearly all creditors · do not transfer it into the trust</li>
+        </ul>
+      </div>
+
+      <!-- Step 4: Solo 401k -->
+      <div class="step-card">
+        <div class="step-top">
+          <div class="step-left">
+            <div class="step-num" style="color:#c084e0">4</div>
+            <div class="step-info">
+              <h3>Open a Solo 401(k) through your LLC</h3>
+              <p>The LLC unlocks the most powerful retirement account available to the self-employed. Contribute as both employee and employer for massive tax-deferred growth.</p>
+            </div>
+          </div>
+          <span class="step-badge badge-purple">High impact</span>
+        </div>
+        <ul class="step-bullets">
+          <li><strong>Employee deferral:</strong> up to $23,000/yr (2024) · $30,500 if age 50+ · pre-tax, reduces taxable income dollar-for-dollar</li>
+          <li><strong>Employer contribution:</strong> up to 25% of W-2 salary (S-Corp) or ~20% of net SE income (disregarded) · paid by the LLC</li>
+          <li><strong>Combined max: <span id="b-401k-max">—</span>/yr</strong> at your income level · $69,000 IRS cap (2024)</li>
+          <li>Open at <strong>Fidelity, Schwab, or Vanguard</strong> — all offer free Solo 401(k) plans with no annual fees</li>
+          <li>Must be <strong>opened by December 31</strong> of the tax year you want contributions to count</li>
+          <li>Employee contributions due by Dec 31 · employer contributions due by your tax filing deadline (including extensions)</li>
+        </ul>
+      </div>
+
+      <!-- Step 5: S-Corp -->
+      <div class="step-card" id="step4-card">
+        <div class="step-top">
+          <div class="step-left">
+            <div class="step-num" style="color:#daa050">5</div>
+            <div class="step-info">
+              <h3 id="step4-title">Decide on S-Corp election</h3>
+              <p id="step4-desc">Run the breakeven math carefully. S-Corp also affects your 401(k) employer match — factor both into the decision.</p>
+            </div>
+          </div>
+          <span class="step-badge badge-amber" id="step4-badge">Evaluate carefully</span>
+        </div>
+        <ul class="step-bullets">
+          <li>File <strong>Form 2553</strong> within 75 days of LLC formation, or by March 15 for the current tax year</li>
+          <li>Set up payroll via Gusto or ADP (~$50/month) · run actual W-2 payroll for yourself</li>
+          <li>Pay yourself a <strong>reasonable salary (~<span id="b-salary">$45,000</span>)</strong> · take the remainder as distributions (no SE tax on distributions)</li>
+          <li>S-Corp salary is the basis for your <strong>employer 401(k) contribution</strong> — a higher salary unlocks a larger employer match</li>
+          <li>IRS watches S-Corp owner salaries closely — the salary must be defensible for your industry and role</li>
+        </ul>
+      </div>
+
+      <!-- Step 6: Maintain -->
+      <div class="step-card">
+        <div class="step-top">
+          <div class="step-left">
+            <div class="step-num" style="color:var(--muted)">6</div>
+            <div class="step-info">
+              <h3>Maintain the structure (ongoing)</h3>
+              <p>Sloppy maintenance lets creditors pierce the veil. Treat the LLC as a genuinely separate legal entity every single day.</p>
+            </div>
+          </div>
+          <span class="step-badge" style="color:var(--muted);border-color:#3d3b34" id="maint-badge">Ongoing</span>
+        </div>
+        <ul class="step-bullets">
+          <li>Keep LLC bank account <strong>strictly separate</strong> — document every transfer between personal and LLC accounts</li>
+          <li>Hold an annual LLC meeting and keep written minutes (even as sole member)</li>
+          <li>File <strong>Texas Franchise Tax Report</strong> annually by May 15 — most small LLCs file "No Tax Due"</li>
+          <li id="maint-scorp-li">File <strong>Form 1120-S</strong> annually if S-Corp elected · file payroll tax returns quarterly</li>
+          <li>Make 401(k) <strong>employee contributions by December 31</strong> · employer contributions by your filing deadline</li>
+          <li>Review trust document and beneficiary designations every <strong>2–3 years</strong> or after major life events</li>
+          <li>Notify your homeowner's insurance and mortgage servicer if you haven't already after the deed transfer</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Priority order -->
+    <section>
+      <div class="steps-title">Priority order — start here</div>
+      <div class="priority-list">
+        <div class="priority-item">
+          <div class="p-num">1</div>
+          <div class="p-text">
+            <strong>Trust first</strong>
+            <span>Protects home, brokerage, and LLC membership immediately · avoids probate</span>
+          </div>
+        </div>
+        <div class="priority-item">
+          <div class="p-num">2</div>
+          <div class="p-text">
+            <strong>LLC second</strong>
+            <span>Routes business income properly from day one</span>
+          </div>
+        </div>
+        <div class="priority-item">
+          <div class="p-num">3</div>
+          <div class="p-text">
+            <strong>Brokerage retitle third</strong>
+            <span>Quick win — change-of-ownership form, no tax event</span>
+          </div>
+        </div>
+        <div class="priority-item">
+          <div class="p-num">4</div>
+          <div class="p-text">
+            <strong>Home deed transfer fourth</strong>
+            <span>Needs attorney + lender notification · preserves homestead exemption</span>
+          </div>
+        </div>
+        <div class="priority-item">
+          <div class="p-num">5</div>
+          <div class="p-text">
+            <strong>Open Solo 401(k) fifth</strong>
+            <span>Must be opened by Dec 31 · biggest annual tax deduction available</span>
+          </div>
+        </div>
+        <div class="priority-item">
+          <div class="p-num">6</div>
+          <div class="p-text">
+            <strong id="p6-label">S-Corp election last</strong>
+            <span id="p6-sub">Only after LLC is running and income is confirmed</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Setup cost -->
+    <section>
+      <div class="steps-title">Estimated setup cost</div>
+      <div class="cost-card">
+        <div class="cost-row-item">
+          <span class="cost-row-label">Revocable living trust (attorney)</span>
+          <span class="cost-row-amt">$1,500</span>
+        </div>
+        <div class="cost-row-item">
+          <span class="cost-row-label">Texas LLC formation (Secretary of State)</span>
+          <span class="cost-row-amt">$300</span>
+        </div>
+        <div class="cost-row-item">
+          <span class="cost-row-label">Registered agent (optional, 1st year)</span>
+          <span class="cost-row-amt">$50 – $150</span>
+        </div>
+        <div class="cost-row-item">
+          <span class="cost-row-label">Operating agreement (attorney)</span>
+          <span class="cost-row-amt">$500</span>
+        </div>
+        <div class="cost-row-item">
+          <span class="cost-row-label">Warranty deed transfer for home</span>
+          <span class="cost-row-amt">$300</span>
+        </div>
+        <div class="cost-row-item" id="scorp-cost-row" style="display:none">
+          <span class="cost-row-label">S-Corp payroll setup (first year)</span>
+          <span class="cost-row-amt">$600</span>
+        </div>
+        <div class="cost-row-item">
+          <span class="cost-row-label">Total setup</span>
+          <span class="cost-row-amt" id="total-setup-cost">~$2,650</span>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--muted);font-family:'Syne Mono',monospace;margin-top:10px;text-align:right">
+        Ongoing annual costs: <span id="ongoing-cost">~$1,500 – $2,500/yr</span>
+      </p>
+    </section>
+
+    <div style="margin-top:48px;background:#1a1200;border:2px solid #c9a84c;border-radius:12px;padding:24px 28px;display:flex;align-items:flex-start;gap:16px;">
+      <div style="flex-shrink:0;width:36px;height:36px;border-radius:50%;background:rgba(201,168,76,0.15);border:1px solid #c9a84c;display:flex;align-items:center;justify-content:center;font-size:18px;color:#c9a84c;font-weight:700;margin-top:2px;">!</div>
+      <div>
+        <div style="font-family:'Syne Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#c9a84c;margin-bottom:8px;">Important — educational use only · not financial, legal, or tax advice</div>
+        <p style="font-size:13px;color:#a09880;line-height:1.8;">
+          <strong style="color:#e8e2d4;">This tool is for illustrative and educational purposes only.</strong> All figures, calculations, tax estimates, cost ranges, and recommendations shown are general examples based on hypothetical inputs and <strong style="color:#e8e2d4;">do not constitute financial, legal, or tax advice for any specific person or situation.</strong> Every individual's circumstances — income type, business structure, state of residency, marital status, existing assets, risk tolerance, credit history, and overall tax situation — are unique and may produce materially different outcomes than shown here. The calculations in this planner use simplified assumptions and may not reflect current IRS rules, Texas law, or your actual facts. Nothing in this planner creates an attorney-client, CPA-client, financial advisor-client, or any other professional relationship. <strong style="color:#e8e2d4;">Always consult a licensed CPA, estate planning attorney, and registered financial advisor before forming any legal entity, executing any trust document, making any tax election, contributing to any retirement account, or implementing any asset protection strategy.</strong> Do not rely on this planner as a substitute for professional advice tailored to your specific situation.
+        </p>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  const fmt = n => '$' + Math.round(n).toLocaleString();
+
+  function calcSE(income) {
+    const cap = 168600;
+    if (income <= cap) return income * 0.9235 * 0.153;
+    return cap * 0.9235 * 0.153 + (income - cap) * 0.9235 * 0.029;
+  }
+
+  function reasonableSalary(income) {
+    return Math.min(income * 0.6, 150000);
+  }
+
+  function calc401k(income, isSCorp) {
+    const employeeDeferral = Math.min(23000, income);
+    let employerMatch;
+    if (isSCorp) {
+      employerMatch = reasonableSalary(income) * 0.25;
+    } else {
+      employerMatch = income * 0.9235 * 0.20;
+    }
+    const total = Math.min(employeeDeferral + employerMatch, 69000);
+    return { employeeDeferral, employerMatch, total };
+  }
+
+  function update() {
+    const income  = parseInt(document.getElementById('sl-income').value);
+    const home    = parseInt(document.getElementById('sl-home').value);
+    const broker  = parseInt(document.getElementById('sl-broker').value);
+    const bal401k = parseInt(document.getElementById('sl-401k').value);
+
+    // Sidebar value labels
+    document.getElementById('val-income').textContent = fmt(income);
+    document.getElementById('val-home').textContent   = fmt(home);
+    document.getElementById('val-broker').textContent = fmt(broker);
+    document.getElementById('val-401k').textContent   = fmt(bal401k);
+
+    // SE calcs
+    const seDis  = calcSE(income);
+    const salary = reasonableSalary(income);
+    const dist   = income - salary;
+    const seSC   = calcSE(salary);
+    const netSavings = (seDis - seSC) - 2500;
+
+    const shouldSCorp = netSavings > 500;
+    const atBreakeven = !shouldSCorp && netSavings > -500;
+
+    // 401k calcs
+    const k401dis = calc401k(income, false);
+    const k401sc  = calc401k(income, true);
+    const k401active = shouldSCorp ? k401sc : k401dis;
+
+    // Sidebar totals
+    document.getElementById('tot-home').textContent        = fmt(home);
+    document.getElementById('tot-broker').textContent      = fmt(broker);
+    document.getElementById('tot-401k').textContent        = fmt(bal401k);
+    document.getElementById('tot-assets').textContent      = fmt(home + broker + bal401k);
+    document.getElementById('tot-401k-contrib').textContent= fmt(k401active.total) + '/yr';
+    document.getElementById('tot-se-dis').textContent      = fmt(seDis);
+    document.getElementById('tot-se-scorp').textContent    = fmt(seSC);
+    document.getElementById('tot-savings').textContent     = netSavings > 0 ? fmt(netSavings) + '/yr' : 'Not beneficial';
+    document.getElementById('tot-rec').textContent         = shouldSCorp ? 'S-Corp' : 'Disregarded';
+
+    // Asset snaps
+    document.getElementById('snap-income').textContent = fmt(income);
+    document.getElementById('snap-home').textContent   = fmt(home);
+    document.getElementById('snap-broker').textContent = fmt(broker);
+    document.getElementById('snap-401k').textContent   = fmt(bal401k);
+    document.getElementById('snap-vehicle').textContent = shouldSCorp ? 'S-Corp election' : 'Disregarded entity';
+
+    // Bullet refs
+    document.getElementById('b-home').textContent     = fmt(home);
+    document.getElementById('b-broker').textContent   = fmt(broker);
+    document.getElementById('b-income').textContent   = fmt(income);
+    document.getElementById('b-401k').textContent     = fmt(bal401k);
+    document.getElementById('b-salary').textContent   = fmt(salary);
+    document.getElementById('b-401k-max').textContent = fmt(k401active.total);
+
+    // Tax table
+    document.getElementById('tc-profit-dis').textContent = fmt(income);
+    document.getElementById('tc-profit-sc').textContent  = fmt(income);
+    document.getElementById('tc-salary').textContent     = fmt(salary);
+    document.getElementById('tc-dist').textContent       = fmt(dist);
+    document.getElementById('tc-401k-dis').textContent   = fmt(k401dis.total) + '/yr';
+    document.getElementById('tc-401k-sc').textContent    = fmt(k401sc.total) + '/yr';
+    document.getElementById('tc-se-dis').textContent     = fmt(seDis);
+    document.getElementById('tc-se-sc').textContent      = fmt(seSC);
+
+    const savingsEl = document.getElementById('tc-savings');
+    if (netSavings > 0) {
+      savingsEl.textContent = fmt(netSavings) + '/yr';
+      savingsEl.className = 'mono gold-val';
+    } else {
+      savingsEl.textContent = 'Not beneficial at this income';
+      savingsEl.className = 'mono red-val';
+    }
+
+    // Tax badge
+    const taxBadge = document.getElementById('tax-badge');
+    if (shouldSCorp)      { taxBadge.textContent = 'S-Corp recommended';    taxBadge.className = 'step-badge badge-green'; }
+    else if (atBreakeven) { taxBadge.textContent = 'At breakeven';           taxBadge.className = 'step-badge badge-gold'; }
+    else                  { taxBadge.textContent = 'Stick with disregarded'; taxBadge.className = 'step-badge badge-blue'; }
+
+    // Rec banner
+    const banner  = document.getElementById('rec-banner');
+    const recText = document.getElementById('rec-text');
+    if (shouldSCorp) {
+      banner.className = 'rec-banner recommend-scorp';
+      document.getElementById('rec-tag').textContent = '✓ S-Corp election recommended';
+      recText.innerHTML = `At <strong>${fmt(income)}</strong> annual income, S-Corp saves approximately <strong>${fmt(netSavings)}/year</strong> in SE tax after compliance costs. Pay yourself a salary of <strong>${fmt(salary)}</strong>, take <strong>${fmt(dist)}</strong> as distributions. Your Solo 401(k) can receive up to <strong>${fmt(k401sc.total)}/yr</strong> — including an employer match of <strong>${fmt(k401sc.employerMatch)}</strong>.`;
+    } else {
+      banner.className = 'rec-banner recommend-dis';
+      document.getElementById('rec-tag').textContent = 'Disregarded entity recommended';
+      recText.innerHTML = `At <strong>${fmt(income)}</strong> annual income, S-Corp compliance costs outweigh the SE tax savings. Stay as a <strong>disregarded entity</strong> — simpler, cheaper, and equally effective for asset protection. Your Solo 401(k) can still receive up to <strong>${fmt(k401dis.total)}/yr</strong> at this income. Revisit S-Corp when income consistently exceeds <strong>$75,000</strong>.`;
+    }
+
+    // Step 5 (S-Corp)
+    const s4title = document.getElementById('step4-title');
+    const s4desc  = document.getElementById('step4-desc');
+    const s4badge = document.getElementById('step4-badge');
+    if (shouldSCorp) {
+      s4title.textContent = 'Elect S-Corp status';
+      s4desc.textContent  = `At ${fmt(income)}, S-Corp saves ~${fmt(netSavings)}/yr after compliance costs and increases your employer 401(k) match from ${fmt(k401dis.employerMatch)} to ${fmt(k401sc.employerMatch)}/yr.`;
+      s4badge.textContent = 'Recommended';
+      s4badge.className   = 'step-badge badge-green';
+    } else if (atBreakeven) {
+      s4title.textContent = 'S-Corp: evaluate carefully';
+      s4desc.textContent  = `Right at the breakeven threshold. Note: S-Corp increases your employer 401(k) match from ${fmt(k401dis.employerMatch)} to ${fmt(k401sc.employerMatch)}/yr — factor that benefit into the decision before passing.`;
+      s4badge.textContent = 'Close call';
+      s4badge.className   = 'step-badge badge-gold';
+    } else {
+      s4title.textContent = 'Skip S-Corp for now';
+      s4desc.textContent  = `At ${fmt(income)}, compliance costs outweigh the SE tax savings. Stay as a disregarded entity and revisit when income grows past $75k.`;
+      s4badge.textContent = 'Not yet';
+      s4badge.className   = 'step-badge badge-blue';
+    }
+
+    // Priority step 6
+    document.getElementById('p6-label').textContent = shouldSCorp ? 'S-Corp election — file Form 2553' : 'S-Corp election — revisit when income grows';
+    document.getElementById('p6-sub').textContent   = shouldSCorp ? `Net savings of ${fmt(netSavings)}/yr makes this worthwhile now` : 'Not cost-effective at your current income level';
+
+    // Setup costs
+    document.getElementById('scorp-cost-row').style.display = shouldSCorp ? 'flex' : 'none';
+    document.getElementById('total-setup-cost').textContent = shouldSCorp ? '~$3,250' : '~$2,650';
+    document.getElementById('ongoing-cost').textContent     = shouldSCorp
+      ? '~$3,000 – $4,000/yr (includes payroll + 1120-S)'
+      : '~$1,500 – $2,500/yr';
+  }
+
+  document.getElementById('sl-income').addEventListener('input', update);
+  document.getElementById('sl-home').addEventListener('input', update);
+  document.getElementById('sl-broker').addEventListener('input', update);
+  document.getElementById('sl-401k').addEventListener('input', update);
+
+  update();
+</script>
+</body>
+</html>
