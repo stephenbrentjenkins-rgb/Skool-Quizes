@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>IOF Knowledge Assessment</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #111318;
+    --surface2: #181c23;
+    --border: #232830;
+    --accent: #f0c040;
+    --accent2: #3b82f6;
+    --accent3: #22c55e;
+    --danger: #ef4444;
+    --text: #e8eaf0;
+    --muted: #7a8090;
+    --mono: 'Space Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+    --serif: 'DM Serif Display', serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: rgba(10,12,16,0.97);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+  .logo {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--accent);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .header-right {
+    display: flex; align-items: center; gap: 1.5rem;
+  }
+  .score-pill {
+    font-family: var(--mono); font-size: 0.7rem;
+    color: var(--muted); letter-spacing: 0.1em;
+    border: 1px solid var(--border);
+    padding: 0.3rem 0.8rem; border-radius: 20px;
+  }
+  .score-pill span { color: var(--accent); font-weight: 700; }
+  .progress-bar {
+    width: 160px; height: 4px;
+    background: var(--border); border-radius: 2px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; background: var(--accent);
+    border-radius: 2px; transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  /* ── MAIN ── */
+  main {
+    max-width: 760px; margin: 0 auto;
+    padding: 3rem 2rem 8rem;
+  }
+
+  /* ── INTRO SCREEN ── */
+  #introScreen {
+    text-align: center; padding: 2rem 0 3rem;
+  }
+  .intro-tag {
+    font-family: var(--mono); font-size: 0.7rem;
+    color: var(--accent); letter-spacing: 0.18em;
+    text-transform: uppercase; margin-bottom: 1.2rem;
+    display: inline-flex; align-items: center; gap: 0.5rem;
+  }
+  .intro-tag::before, .intro-tag::after { content: '—'; }
+  h1 {
+    font-family: var(--serif); font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 400; line-height: 1.2; margin-bottom: 1rem;
+  }
+  h1 em { color: var(--accent); font-style: italic; }
+  .intro-sub {
+    color: var(--muted); font-size: 1rem;
+    max-width: 480px; margin: 0 auto 2.5rem;
+  }
+  .stats-row {
+    display: flex; justify-content: center; gap: 2rem;
+    margin-bottom: 2.5rem; flex-wrap: wrap;
+  }
+  .stat-item { text-align: center; }
+  .stat-val {
+    font-family: var(--mono); font-size: 1.6rem;
+    color: var(--accent); display: block;
+  }
+  .stat-lbl {
+    font-size: 0.78rem; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+  .btn-start {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    background: var(--accent); color: #000;
+    font-family: var(--mono); font-size: 0.8rem;
+    font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.95rem 2.4rem; border-radius: 6px;
+    border: none; cursor: pointer; transition: all 0.2s;
+    font-size: 0.82rem;
+  }
+  .btn-start:hover { background: #f7d060; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(240,192,64,0.2); }
+
+  /* ── QUIZ AREA ── */
+  #quizArea { display: none; }
+
+  .question-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px; padding: 2.2rem;
+    display: none; animation: fadeUp 0.35s ease;
+  }
+  .question-card.active { display: block; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .q-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1.2rem;
+  }
+  .q-num {
+    font-family: var(--mono); font-size: 0.65rem;
+    color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase;
+  }
+  .q-category {
+    font-family: var(--mono); font-size: 0.6rem;
+    color: var(--accent2); letter-spacing: 0.1em; text-transform: uppercase;
+    background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2);
+    padding: 0.2rem 0.6rem; border-radius: 3px;
+  }
+  .q-text {
+    font-size: 1.08rem; font-weight: 500;
+    line-height: 1.55; margin-bottom: 1.6rem; color: var(--text);
+  }
+  .q-options { display: flex; flex-direction: column; gap: 0.65rem; }
+  .q-option {
+    display: flex; align-items: flex-start; gap: 0.9rem;
+    padding: 0.95rem 1.2rem; border-radius: 9px;
+    border: 1px solid var(--border); background: var(--surface2);
+    cursor: pointer; transition: all 0.15s; font-size: 0.94rem;
+    user-select: none;
+  }
+  .q-option:hover:not(.disabled) {
+    border-color: var(--accent);
+    background: rgba(240,192,64,0.06);
+    transform: translateX(2px);
+  }
+  .q-option.selected { border-color: var(--accent); background: rgba(240,192,64,0.08); }
+  .q-option.correct  { border-color: var(--accent3); background: rgba(34,197,94,0.1); }
+  .q-option.wrong    { border-color: var(--danger);  background: rgba(239,68,68,0.08); }
+  .q-option.dimmed   { opacity: 0.35; }
+  .q-option.disabled { cursor: default; pointer-events: none; }
+
+  .q-letter {
+    font-family: var(--mono); font-size: 0.72rem;
+    color: var(--muted); flex-shrink: 0; margin-top: 0.15rem;
+    width: 16px;
+  }
+  .q-option.correct .q-letter { color: var(--accent3); }
+  .q-option.wrong   .q-letter { color: var(--danger); }
+  .q-option.selected:not(.correct):not(.wrong) .q-letter { color: var(--accent); }
+
+  .q-feedback {
+    margin-top: 1.1rem; padding: 1rem 1.2rem;
+    border-radius: 8px; font-size: 0.88rem;
+    line-height: 1.6; display: none;
+  }
+  .q-feedback.show { display: block; animation: fadeUp 0.25s ease; }
+  .q-feedback.correct-fb {
+    background: rgba(34,197,94,0.07);
+    border: 1px solid rgba(34,197,94,0.2); color: #86efac;
+  }
+  .q-feedback.wrong-fb {
+    background: rgba(239,68,68,0.07);
+    border: 1px solid rgba(239,68,68,0.2); color: #fca5a5;
+  }
+  .q-feedback strong {
+    display: block; margin-bottom: 0.3rem;
+    font-family: var(--mono); font-size: 0.7rem;
+    letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.8;
+  }
+
+  .q-footer {
+    display: flex; justify-content: space-between;
+    align-items: center; margin-top: 1.4rem;
+  }
+  .q-dots {
+    display: flex; gap: 5px; flex-wrap: wrap; max-width: 240px;
+  }
+  .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--border); transition: background 0.2s;
+  }
+  .dot.answered-correct { background: var(--accent3); }
+  .dot.answered-wrong   { background: var(--danger); }
+  .dot.current          { background: var(--accent); }
+
+  .btn-next {
+    display: none; align-items: center; gap: 0.5rem;
+    background: var(--accent); color: #000;
+    font-family: var(--mono); font-size: 0.75rem;
+    font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.7rem 1.6rem; border-radius: 6px;
+    border: none; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-next.show { display: inline-flex; }
+  .btn-next:hover { background: #f7d060; }
+
+  /* ── SCORE CARD ── */
+  #scoreScreen {
+    display: none; animation: fadeUp 0.5s ease;
+  }
+  #scoreScreen.show { display: block; }
+
+  .score-hero {
+    text-align: center; padding: 2.5rem 2rem 3rem;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; margin-bottom: 2rem;
+  }
+  .score-ring {
+    width: 160px; height: 160px;
+    margin: 0 auto 1.8rem; position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .score-ring svg { position: absolute; inset: 0; }
+  .score-ring-inner { text-align: center; z-index: 2; }
+  .score-pct {
+    font-family: var(--mono); font-size: 2.2rem;
+    color: var(--text); display: block; line-height: 1;
+  }
+  .score-pct-lbl {
+    font-family: var(--mono); font-size: 0.6rem;
+    color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase;
+  }
+  .score-title {
+    font-family: var(--serif); font-size: 1.9rem;
+    font-weight: 400; margin-bottom: 0.5rem;
+  }
+  .score-subtitle { color: var(--muted); margin-bottom: 2rem; }
+
+  .score-stats {
+    display: grid; grid-template-columns: repeat(3,1fr);
+    gap: 1rem; margin-bottom: 2rem;
+  }
+  .score-stat {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 1rem; text-align: center;
+  }
+  .score-stat-val {
+    font-family: var(--mono); font-size: 1.8rem;
+    display: block; margin-bottom: 0.2rem;
+  }
+  .score-stat-lbl { font-size: 0.78rem; color: var(--muted); }
+
+  .pass-badge {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.12em;
+    text-transform: uppercase; padding: 0.4rem 1rem; border-radius: 20px;
+    margin-bottom: 1.5rem;
+  }
+  .pass-badge.pass { background: rgba(34,197,94,0.12); color: var(--accent3); border: 1px solid rgba(34,197,94,0.3); }
+  .pass-badge.fail { background: rgba(239,68,68,0.10); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+
+  /* Review section */
+  .review-title {
+    font-family: var(--mono); font-size: 0.7rem; color: var(--muted);
+    letter-spacing: 0.14em; text-transform: uppercase;
+    margin-bottom: 1rem; padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .review-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.2rem 1.4rem; margin-bottom: 0.75rem;
+  }
+  .review-item.r-correct { border-left: 3px solid var(--accent3); }
+  .review-item.r-wrong   { border-left: 3px solid var(--danger); }
+  .review-q {
+    font-size: 0.92rem; font-weight: 500; margin-bottom: 0.5rem;
+    display: flex; gap: 0.6rem;
+  }
+  .review-icon { flex-shrink: 0; }
+  .review-answers { font-size: 0.83rem; color: var(--muted); }
+  .review-correct-ans { color: var(--accent3); }
+  .review-wrong-ans   { color: var(--danger); text-decoration: line-through; }
+
+  .btn-row {
+    display: flex; gap: 0.75rem; justify-content: center;
+    flex-wrap: wrap; margin-top: 1.5rem;
+  }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: var(--accent); color: #000;
+    font-family: var(--mono); font-size: 0.76rem;
+    font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.8rem 1.8rem; border-radius: 6px;
+    border: none; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-primary:hover { background: #f7d060; }
+  .btn-secondary {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: transparent; color: var(--text);
+    font-family: var(--mono); font-size: 0.76rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 0.8rem 1.8rem; border-radius: 6px;
+    border: 1px solid var(--border); cursor: pointer; transition: all 0.2s;
+  }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  @media (max-width: 540px) {
+    .score-stats { grid-template-columns: 1fr 1fr; }
+    .stats-row { gap: 1.5rem; }
+    main { padding: 2rem 1.2rem 6rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">⬡ IOF — Knowledge Assessment</div>
+  <div class="header-right">
+    <div class="score-pill">Score: <span id="liveScore">0</span> / <span id="livePossible">0</span></div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+</header>
+
+<main>
+
+  <!-- INTRO -->
+  <div id="introScreen">
+    <div class="intro-tag">Beginner Assessment</div>
+    <h1>Institutional Order Flow<br><em>Quiz</em></h1>
+    <p class="intro-sub">20 questions covering IOF fundamentals — concepts, jargon, the AMD cycle, scoring, and trade management. Score 80% or higher to pass.</p>
+    <div class="stats-row">
+      <div class="stat-item"><span class="stat-val">20</span><span class="stat-lbl">Questions</span></div>
+      <div class="stat-item"><span class="stat-val">80%</span><span class="stat-lbl">Pass Mark</span></div>
+      <div class="stat-item"><span class="stat-val">~10</span><span class="stat-lbl">Minutes</span></div>
+    </div>
+    <button class="btn-start" onclick="startQuiz()">▶ Begin Assessment</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quizArea"></div>
+
+  <!-- RESULTS -->
+  <div id="scoreScreen"></div>
+
+</main>
+
+<script>
+const QUESTIONS = [
+  {
+    cat: "Core Concepts",
+    q: "What does 'Institutional Order Flow' (IOF) refer to?",
+    opts: ["The volume of orders placed by retail traders on a given day","The buying and selling patterns of large financial institutions that move markets","A technical indicator showing order book depth","The average daily trading range of a currency pair"],
+    ans: 1,
+    fb: "IOF refers to the collective buying and selling activity of banks, hedge funds, and other large institutions. Because they trade in enormous size, their order flow literally moves price."
+  },
+  {
+    cat: "Core Concepts",
+    q: "Approximately what percentage of retail trader losses go to institutions and banks?",
+    opts: ["20–30%","40–50%","70–80%","90–95%"],
+    ans: 2,
+    fb: "Studies and IOF theory consistently point to 70–80% of retail losses flowing to institutional players. Understanding this dynamic is the core motivation for learning IOF."
+  },
+  {
+    cat: "Liquidity & Traps",
+    q: "What is a 'Stop Hunt' in IOF terminology?",
+    opts: ["A news event that causes sudden price movement","A deliberate institutional move designed to trigger retail stop-loss orders before reversing","A strategy of tightening your stop-loss as price moves in your favor","A chart pattern where price stops at a support level"],
+    ans: 1,
+    fb: "A Stop Hunt (also called a Liquidity Sweep) is when institutions intentionally push price through common stop-loss clusters to collect that liquidity for their own orders, then reverse price in the true direction."
+  },
+  {
+    cat: "AMD Cycle",
+    q: "In the institutional 3-phase cycle, what is the correct order of phases?",
+    opts: ["Distribution → Accumulation → Manipulation","Manipulation → Distribution → Accumulation","Accumulation → Manipulation → Distribution","Accumulation → Distribution → Manipulation"],
+    ans: 2,
+    fb: "The cycle is: Accumulation (institution builds position quietly) → Manipulation (stop hunt / false move) → Distribution (true directional move). This is the AMD cycle."
+  },
+  {
+    cat: "Key Concepts",
+    q: "What is an 'Order Block' (OB)?",
+    opts: ["A limit order that has been partially filled","A zone where large institutional orders were placed before a major price move","A type of stop-loss order","A range of prices where retail traders commonly enter"],
+    ans: 1,
+    fb: "An Order Block is the institutional footprint — the price zone (typically the last opposing candle before a strong directional move) where large orders were placed. Price often revisits these zones and reacts strongly."
+  },
+  {
+    cat: "Key Concepts",
+    q: "A 'Bullish Order Block' is formed by which candle?",
+    opts: ["The last bullish candle before a strong upward move","The last bearish candle before a strong upward move","The largest candle in an uptrend","The first candle of a consolidation range"],
+    ans: 1,
+    fb: "A Bullish Order Block is the last bearish (down) candle before price makes a strong move upward. This is where institutions placed their buy orders — and where price often returns for a re-entry opportunity."
+  },
+  {
+    cat: "Key Concepts",
+    q: "What is a 'Fair Value Gap' (FVG)?",
+    opts: ["The difference between bid and ask prices","A three-candle pattern where price moved so fast that the first and third candle wicks don't overlap, leaving a gap","A gap between two daily candle closes","The space between a moving average and price"],
+    ans: 1,
+    fb: "An FVG is a three-candle imbalance where the wick of candle 1 and the wick of candle 3 do not overlap. This gap represents price that moved too fast, skipping levels — markets often return to fill these zones."
+  },
+  {
+    cat: "Timeframes",
+    q: "What does 'higher timeframes control lower timeframes' mean?",
+    opts: ["You should always trade on the 1-hour chart","A trend on a daily chart carries more weight and capital than a trend on a 5-minute chart","Higher timeframe charts are more difficult to read","Institutions only trade on monthly charts"],
+    ans: 1,
+    fb: "It takes significantly more capital to drive price movement on a monthly chart than on a 5-minute chart. This means higher timeframe trends are more powerful and will override lower timeframe signals."
+  },
+  {
+    cat: "Timeframes",
+    q: "Which trading style is MOST recommended for beginners learning IOF?",
+    opts: ["Scalping (M15, M5, M1)","Day Trading (H1, M15, M5)","Swing Trading (Daily, H4, H1)","Position Trading (Monthly, Weekly, Daily)"],
+    ans: 2,
+    fb: "Swing trading is ideal for beginners because it offers cleaner signals on higher timeframes, more time to analyze before acting, lower stress, and better risk-to-reward opportunities with IOF setups."
+  },
+  {
+    cat: "Market Structure",
+    q: "What is a 'Break of Structure' (BOS)?",
+    opts: ["When price breaks above a Fibonacci level","When price decisively breaks above a previous swing high (uptrend) or below a previous swing low (downtrend)","When a candle closes outside a Bollinger Band","When price moves outside the normal daily range"],
+    ans: 1,
+    fb: "A BOS occurs when price convincingly breaks through a structural high or low, confirming trend continuation. It tells IOF traders that institutional momentum is still active in that direction."
+  },
+  {
+    cat: "Market Structure",
+    q: "What is a 'Change of Character' (ChoCH)?",
+    opts: ["When a trader changes their strategy mid-session","A break of structure in the OPPOSITE direction of the prevailing trend, signaling a potential reversal","When price changes behavior from trending to ranging","A sudden increase in trading volume"],
+    ans: 1,
+    fb: "ChoCH signals that institutional order flow may be reversing. It is a BOS against the current trend direction, alerting traders that Smart Money may be switching from buying to selling (or vice versa)."
+  },
+  {
+    cat: "AMD Cycle",
+    q: "During which trading session does the Manipulation phase (stop hunt) most commonly occur?",
+    opts: ["Asian session","London Open","New York Close","European Afternoon"],
+    ans: 1,
+    fb: "The London Open (approximately 3AM–6AM EST) is the most common time for institutional manipulation and liquidity sweeps. This is when the largest volume enters the market and institutions execute their stop hunts."
+  },
+  {
+    cat: "Key Concepts",
+    q: "What is 'Displacement' in IOF analysis?",
+    opts: ["When your trade is moved to a different broker","A strong, fast, aggressive price move with institutional conviction that leaves imbalances behind","The difference between entry price and stop-loss","When a candle closes far from its open"],
+    ans: 1,
+    fb: "Displacement is characterized by speed, force, and imbalance — it typically creates Fair Value Gaps and confirms that Smart Money is actively executing large orders. Without displacement, a move is likely just noise."
+  },
+  {
+    cat: "Liquidity & Traps",
+    q: "Where do 'Sell-Side Liquidity' pools most commonly rest?",
+    opts: ["Above recent swing highs","Below recent swing lows and obvious support levels","At psychological round numbers above price","At moving average crossovers"],
+    ans: 1,
+    fb: "Sell-side liquidity refers to clusters of sell stop-loss orders sitting BELOW support levels and recent swing lows. Retail traders defending long positions place stops there — making those levels prime targets for institutional stop hunts."
+  },
+  {
+    cat: "Key Concepts",
+    q: "What is a 'Breaker Block'?",
+    opts: ["A very large Order Block from the monthly chart","An Order Block that has failed (price broke through it) and now acts as the opposite type of level","A block of orders that breaks the market structure","A support/resistance level that has never been touched"],
+    ans: 1,
+    fb: "When an Order Block fails to hold and price breaks through it, that OB becomes a Breaker Block — it flips from support to resistance (or vice versa). Breaker Blocks are highly reliable reversal points when revisited for the first time."
+  },
+  {
+    cat: "Zone Scoring",
+    q: "In the 20-point zone scoring system, what does 'Purity' measure?",
+    opts: ["How clean the chart looks without indicators","How many times price has already returned and tested the zone","The size of the impulse candle away from the zone","Whether the zone is inside the trading range"],
+    ans: 1,
+    fb: "Purity measures how many times price has retraced to the zone. Never returned = 4 points (pure zone, most unfilled orders remain). Returned once = 2 points. Returned multiple times = 0 points and requires a confirmation candle before entry."
+  },
+  {
+    cat: "Zone Scoring",
+    q: "What is the maximum possible score in the IOF 20-point zone scoring system?",
+    opts: ["14 points","16 points","18 points","20 points"],
+    ans: 3,
+    fb: "The scoring system has 6 criteria: Range (max 2) + Time (max 2) + Purity (max 4) + Strength (max 4) + Trend (max 4) + Risk/Reward (max 4) = 20 points total. This single score is produced after evaluating all three timeframes."
+  },
+  {
+    cat: "Zone Scoring",
+    q: "What minimum Risk-to-Reward ratio must a trade achieve to score full points on the R/R criterion?",
+    opts: ["1:1","2:1","3:1","5:1"],
+    ans: 2,
+    fb: "The target is a 3:1 Risk-to-Reward ratio — for every $1 risked, you are targeting $3 in profit. Stop-loss is placed at the bottom of the scored zone, and the reward target is pulled up until the ratio reads 3."
+  },
+  {
+    cat: "AMD Cycle",
+    q: "Which trading session is generally associated with the ACCUMULATION phase of the institutional cycle?",
+    opts: ["New York Open","London Open","Asian Session","Frankfurt Open"],
+    ans: 2,
+    fb: "The Asian Session (roughly 7PM–4AM EST) is known for lower volatility and ranging price action — the conditions that allow institutions to quietly accumulate positions without moving price significantly."
+  },
+  {
+    cat: "Zone Scoring",
+    q: "In the zone scoring system, what does a 'Strength' score of 0 indicate?",
+    opts: ["The zone is outside the trading range","Price shot away from the zone with large, aggressive candles","The impulse away from the zone was weak — it may not hold on retracement and could push through","Price has returned to the zone multiple times"],
+    ans: 2,
+    fb: "A weak impulse out of a zone (Strength = 0) signals that the institution may not have left enough unfilled orders to trigger a strong bounce on retracement. Price could push right through the zone without reversing."
+  }
+];
+
+// ── STATE ──
+let currentQ = 0;
+let answers  = {};
+let submitted = {};
+let correctCount = 0;
+
+// ── INIT ──
+function startQuiz() {
+  document.getElementById('introScreen').style.display = 'none';
+  document.getElementById('quizArea').style.display = 'block';
+  buildQuiz();
+}
+
+function buildQuiz() {
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  QUESTIONS.forEach((q, qi) => {
+    const card = document.createElement('div');
+    card.className = 'question-card' + (qi === 0 ? ' active' : '');
+    card.id = 'qcard' + qi;
+    card.innerHTML = `
+      <div class="q-header">
+        <div class="q-num">Question ${qi + 1} of ${QUESTIONS.length}</div>
+        <div class="q-category">${q.cat}</div>
+      </div>
+      <div class="q-text">${q.q}</div>
+      <div class="q-options">
+        ${q.opts.map((o, oi) => `
+          <div class="q-option" id="qo${qi}_${oi}" onclick="pick(${qi},${oi})">
+            <span class="q-letter">${String.fromCharCode(65 + oi)}.</span>
+            <span>${o}</span>
+          </div>`).join('')}
+      </div>
+      <div class="q-feedback" id="qfb${qi}"></div>
+      <div class="q-footer">
+        <div class="q-dots" id="dots${qi}"></div>
+        <button class="btn-next" id="qnext${qi}" onclick="advance(${qi})">
+          ${qi === QUESTIONS.length - 1 ? 'See Results →' : 'Next →'}
+        </button>
+      </div>
+    `;
+    area.appendChild(card);
+    renderDots(qi);
+  });
+}
+
+function renderDots(qi) {
+  const container = document.getElementById('dots' + qi);
+  if (!container) return;
+  container.innerHTML = '';
+  QUESTIONS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot';
+    if (i === qi) d.classList.add('current');
+    else if (submitted[i]) d.classList.add(answers[i] === QUESTIONS[i].ans ? 'answered-correct' : 'answered-wrong');
+    container.appendChild(d);
+  });
+}
+
+function pick(qi, oi) {
+  if (submitted[qi]) return;
+  submitted[qi] = true;
+  answers[qi] = oi;
+  const q = QUESTIONS[qi];
+  const correct = oi === q.ans;
+  if (correct) correctCount++;
+
+  // Style options
+  for (let i = 0; i < q.opts.length; i++) {
+    const el = document.getElementById(`qo${qi}_${i}`);
+    el.classList.add('disabled');
+    if (i === q.ans)           el.classList.add('correct');
+    else if (i === oi)         el.classList.add('wrong');
+    else                       el.classList.add('dimmed');
+  }
+
+  // Feedback
+  const fb = document.getElementById('qfb' + qi);
+  fb.className = 'q-feedback show ' + (correct ? 'correct-fb' : 'wrong-fb');
+  fb.innerHTML = `<strong>${correct ? '✓ Correct' : '✗ Incorrect'}</strong>${q.fb}`;
+
+  // Show next button
+  document.getElementById('qnext' + qi).classList.add('show');
+
+  // Update header live score
+  const answered = Object.keys(submitted).length;
+  document.getElementById('liveScore').textContent = correctCount;
+  document.getElementById('livePossible').textContent = answered;
+  document.getElementById('progressFill').style.width = (answered / QUESTIONS.length * 100) + '%';
+
+  // Refresh dots on current card
+  renderDots(qi);
+}
+
+function advance(qi) {
+  document.getElementById('qcard' + qi).classList.remove('active');
+  if (qi < QUESTIONS.length - 1) {
+    document.getElementById('qcard' + (qi + 1)).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } else {
+    showResults();
+  }
+}
+
+function showResults() {
+  document.getElementById('quizArea').style.display = 'none';
+  const pct = Math.round(correctCount / QUESTIONS.length * 100);
+  const wrong = QUESTIONS.length - correctCount;
+  const pass = pct >= 80;
+  const ringColor = pct >= 80 ? '#22c55e' : pct >= 60 ? '#f0c040' : '#ef4444';
+  const circ = 2 * Math.PI * 62;
+  const offset = circ - (pct / 100) * circ;
+
+  const title = pct >= 80
+    ? 'Assessment Passed 🎓'
+    : pct >= 60
+    ? 'Good Effort — Review & Retry'
+    : 'Keep Studying — You\'ll Get There';
+
+  const sub = pass
+    ? 'You have demonstrated a solid understanding of Institutional Order Flow fundamentals.'
+    : 'Review the lessons on any incorrect questions and retake when ready. 80% required to pass.';
+
+  // Build review list
+  const reviewHTML = QUESTIONS.map((q, qi) => {
+    const correct = answers[qi] === q.ans;
+    const userAns = answers[qi] !== undefined ? q.opts[answers[qi]] : 'Not answered';
+    const correctAns = q.opts[q.ans];
+    return `
+      <div class="review-item ${correct ? 'r-correct' : 'r-wrong'}">
+        <div class="review-q">
+          <span class="review-icon">${correct ? '✓' : '✗'}</span>
+          <span>${qi + 1}. ${q.q}</span>
+        </div>
+        <div class="review-answers">
+          ${!correct ? `<div class="review-wrong-ans">Your answer: ${userAns}</div>` : ''}
+          <div class="review-correct-ans">Correct: ${correctAns}</div>
+        </div>
+      </div>`;
+  }).join('');
+
+  const sc = document.getElementById('scoreScreen');
+  sc.innerHTML = `
+    <div class="score-hero">
+      <div class="score-ring">
+        <svg viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="70" cy="70" r="62" fill="none" stroke="var(--border)" stroke-width="9"/>
+          <circle cx="70" cy="70" r="62" fill="none" stroke="${ringColor}" stroke-width="9"
+            stroke-dasharray="${circ}" stroke-dashoffset="${offset}"
+            stroke-linecap="round" transform="rotate(-90 70 70)"
+            style="transition:stroke-dashoffset 1.2s ease;"/>
+        </svg>
+        <div class="score-ring-inner">
+          <span class="score-pct">${pct}%</span>
+          <span class="score-pct-lbl">Score</span>
+        </div>
+      </div>
+      <div class="pass-badge ${pass ? 'pass' : 'fail'}">${pass ? '✓ PASSED' : '✗ NOT PASSED'}</div>
+      <h2 class="score-title">${title}</h2>
+      <p class="score-subtitle">${sub}</p>
+      <div class="score-stats">
+        <div class="score-stat">
+          <span class="score-stat-val" style="color:var(--accent3);">${correctCount}</span>
+          <div class="score-stat-lbl">Correct</div>
+        </div>
+        <div class="score-stat">
+          <span class="score-stat-val" style="color:var(--danger);">${wrong}</span>
+          <div class="score-stat-lbl">Incorrect</div>
+        </div>
+        <div class="score-stat">
+          <span class="score-stat-val">${QUESTIONS.length}</span>
+          <div class="score-stat-lbl">Total</div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-primary" onclick="retake()">↺ Retake Quiz</button>
+      </div>
+    </div>
+
+    <div>
+      <div class="review-title">Question Review — ${correctCount} of ${QUESTIONS.length} Correct</div>
+      ${reviewHTML}
+    </div>
+  `;
+  sc.classList.add('show');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  document.getElementById('progressFill').style.width = '100%';
+}
+
+function retake() {
+  currentQ = 0; answers = {}; submitted = {}; correctCount = 0;
+  document.getElementById('liveScore').textContent = '0';
+  document.getElementById('livePossible').textContent = '0';
+  document.getElementById('progressFill').style.width = '0%';
+  const sc = document.getElementById('scoreScreen');
+  sc.classList.remove('show'); sc.innerHTML = '';
+  document.getElementById('quizArea').style.display = 'block';
+  buildQuiz();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
