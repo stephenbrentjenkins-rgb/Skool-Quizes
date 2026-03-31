@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Identifying Trends — Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #111318;
+    --surface2: #181c23;
+    --border: #232830;
+    --accent: #f0c040;
+    --accent2: #3b82f6;
+    --accent3: #22c55e;
+    --danger: #ef4444;
+    --text: #e8eaf0;
+    --muted: #7a8090;
+    --mono: 'Space Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+    --serif: 'DM Serif Display', serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,12,16,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+  }
+  .logo {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--accent);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .progress-bar {
+    flex: 1; max-width: 320px; margin: 0 2rem;
+    height: 4px; background: var(--border); border-radius: 2px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; background: var(--accent);
+    border-radius: 2px; transition: width 0.5s ease;
+    width: 0%;
+  }
+  .header-right {
+    font-family: var(--mono); font-size: 0.7rem;
+    color: var(--muted); letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .header-right span { color: var(--accent); }
+
+  /* ── MAIN ── */
+  main { max-width: 760px; margin: 0 auto; padding: 3rem 2rem 8rem; }
+
+  /* ── QUIZ HEADER ── */
+  .quiz-header {
+    text-align: center; margin-bottom: 3rem;
+    padding-bottom: 2rem; border-bottom: 1px solid var(--border);
+  }
+  .quiz-eyebrow {
+    font-family: var(--mono); font-size: 0.72rem;
+    color: var(--accent); letter-spacing: 0.18em;
+    text-transform: uppercase; margin-bottom: 1rem;
+    display: inline-flex; align-items: center; gap: 0.5rem;
+  }
+  .quiz-eyebrow::before, .quiz-eyebrow::after { content: '—'; }
+  h1 {
+    font-family: var(--serif); font-size: clamp(1.8rem, 5vw, 2.8rem);
+    font-weight: 400; line-height: 1.2; margin-bottom: 0.8rem;
+  }
+  .quiz-sub { color: var(--muted); font-size: 0.95rem; margin-bottom: 1.5rem; }
+
+  .stats-strip {
+    display: flex; justify-content: center; gap: 2.5rem;
+    padding: 1rem 0; flex-wrap: wrap;
+  }
+  .stat-item { text-align: center; }
+  .stat-val { font-family: var(--mono); font-size: 1.3rem; color: var(--accent); }
+  .stat-lbl { font-family: var(--mono); font-size: 0.6rem; color: var(--muted);
+    letter-spacing: 0.1em; text-transform: uppercase; margin-top: 0.1rem; }
+
+  /* ── QUESTION CARD ── */
+  .question-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 2rem; margin-bottom: 1.5rem;
+    display: none;
+  }
+  .question-card.active { display: block; animation: fadeUp 0.35s ease; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .q-meta {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  .q-num {
+    font-family: var(--mono); font-size: 0.65rem; color: var(--muted);
+    letter-spacing: 0.12em; text-transform: uppercase;
+  }
+  .q-category {
+    font-family: var(--mono); font-size: 0.6rem;
+    padding: 0.18rem 0.55rem; border-radius: 3px;
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .q-category.structure { background: rgba(240,192,64,0.12); color: var(--accent); }
+  .q-category.trendline { background: rgba(59,130,246,0.12); color: #60a5fa; }
+  .q-category.confirm   { background: rgba(34,197,94,0.12); color: #4ade80; }
+  .q-category.warning   { background: rgba(239,68,68,0.12); color: #f87171; }
+
+  .q-text { font-size: 1.05rem; font-weight: 500; margin-bottom: 1.5rem;
+    line-height: 1.55; color: var(--text); }
+
+  .q-options { display: flex; flex-direction: column; gap: 0.6rem; }
+  .q-option {
+    display: flex; align-items: flex-start; gap: 0.8rem;
+    padding: 0.9rem 1.1rem; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--surface2);
+    cursor: pointer; transition: all 0.15s; font-size: 0.93rem; color: #ccd0dc;
+  }
+  .q-option:hover { border-color: var(--accent); background: rgba(240,192,64,0.05); }
+  .q-option.selected { border-color: var(--accent); background: rgba(240,192,64,0.08); }
+  .q-option.correct  { border-color: var(--accent3); background: rgba(34,197,94,0.1); color: #86efac; }
+  .q-option.wrong    { border-color: var(--danger); background: rgba(239,68,68,0.08); color: #fca5a5; }
+  .q-option.disabled { cursor: default; pointer-events: none; }
+  .q-letter {
+    font-family: var(--mono); font-size: 0.72rem; color: var(--muted);
+    flex-shrink: 0; margin-top: 0.15rem; min-width: 18px;
+  }
+  .q-option.correct .q-letter { color: var(--accent3); }
+  .q-option.wrong   .q-letter { color: var(--danger); }
+  .q-option.selected .q-letter { color: var(--accent); }
+
+  /* ── FEEDBACK ── */
+  .q-feedback {
+    margin-top: 1rem; padding: 1rem 1.2rem; border-radius: 8px;
+    font-size: 0.88rem; display: none; line-height: 1.6;
+  }
+  .q-feedback.show { display: block; animation: fadeUp 0.2s ease; }
+  .q-feedback.correct-fb { background: rgba(34,197,94,0.07); border: 1px solid rgba(34,197,94,0.2); color: #86efac; }
+  .q-feedback.wrong-fb   { background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.2); color: #fca5a5; }
+  .q-feedback strong { display: block; margin-bottom: 0.3rem;
+    font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; }
+
+  /* ── NAV ── */
+  .quiz-nav {
+    display: flex; justify-content: flex-end; margin-top: 1.5rem;
+  }
+  .btn-next {
+    background: var(--accent); color: #000;
+    font-family: var(--mono); font-size: 0.78rem;
+    font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.75rem 1.8rem; border-radius: 6px;
+    border: none; cursor: pointer; transition: all 0.2s;
+    display: none; align-items: center; gap: 0.4rem;
+  }
+  .btn-next:hover { background: #f7d060; transform: translateY(-1px); }
+  .btn-next.show { display: inline-flex; }
+
+  /* ── SCORE CARD ── */
+  .score-card {
+    text-align: center; padding: 3.5rem 2rem;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; display: none;
+  }
+  .score-card.show { display: block; animation: fadeUp 0.5s ease; }
+
+  .score-ring {
+    width: 150px; height: 150px; margin: 0 auto 2rem;
+    position: relative; display: flex; align-items: center; justify-content: center;
+  }
+  .score-ring svg { position: absolute; inset: 0; }
+  .score-ring-inner { position: relative; z-index: 1; }
+  .score-ring-num { font-family: var(--mono); font-size: 2rem; color: var(--text); line-height: 1; }
+  .score-ring-label { font-family: var(--mono); font-size: 0.58rem; color: var(--muted);
+    letter-spacing: 0.12em; text-transform: uppercase; margin-top: 0.2rem; }
+
+  .score-title { font-family: var(--serif); font-size: 2rem; font-weight: 400; margin-bottom: 0.5rem; }
+  .score-sub { color: var(--muted); margin-bottom: 2rem; font-size: 0.95rem; }
+
+  .score-breakdown {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;
+    max-width: 380px; margin: 0 auto 2.5rem;
+  }
+  .score-stat { background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 1rem; }
+  .score-stat-val { font-family: var(--mono); font-size: 1.7rem; }
+  .score-stat-lbl { font-size: 0.75rem; color: var(--muted); margin-top: 0.2rem; }
+
+  .score-detail {
+    max-width: 560px; margin: 0 auto 2rem;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden;
+  }
+  .score-detail-row {
+    display: flex; align-items: center; gap: 1rem;
+    padding: 0.7rem 1.2rem; border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+  }
+  .score-detail-row:last-child { border-bottom: none; }
+  .sdr-num { font-family: var(--mono); font-size: 0.65rem; color: var(--muted); min-width: 28px; }
+  .sdr-text { flex: 1; color: #ccd0dc; text-align: left; }
+  .sdr-result { font-family: var(--mono); font-size: 0.7rem; font-weight: 700; }
+  .sdr-result.ok  { color: var(--accent3); }
+  .sdr-result.no  { color: var(--danger); }
+
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: var(--accent); color: #000;
+    font-family: var(--mono); font-size: 0.78rem;
+    font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.85rem 2rem; border-radius: 6px;
+    border: none; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-primary:hover { background: #f7d060; transform: translateY(-1px); }
+  .btn-secondary {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: transparent; color: var(--text);
+    font-family: var(--mono); font-size: 0.78rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 0.85rem 2rem; border-radius: 6px;
+    border: 1px solid var(--border); cursor: pointer; transition: all 0.2s;
+  }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── PASS BANNER ── */
+  .pass-banner {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.3);
+    border-radius: 6px; padding: 0.6rem 1.2rem;
+    font-family: var(--mono); font-size: 0.72rem; color: #4ade80;
+    letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1.5rem;
+  }
+  .fail-banner {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.3);
+    border-radius: 6px; padding: 0.6rem 1.2rem;
+    font-family: var(--mono); font-size: 0.72rem; color: #f87171;
+    letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 600px) {
+    .score-breakdown { grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; }
+    .stats-strip { gap: 1.5rem; }
+    .score-detail-row { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">⬡ Chart Academy</div>
+  <div class="progress-bar"><div class="progress-fill" id="mainProgress"></div></div>
+  <div class="header-right">Question <span id="qCounter">1</span> of 20</div>
+</header>
+
+<main>
+
+  <!-- Quiz Header -->
+  <div class="quiz-header">
+    <div class="quiz-eyebrow">Knowledge Check</div>
+    <h1>Identifying Trends Quiz</h1>
+    <p class="quiz-sub">20 questions covering trend structure, trendlines, and confirmation tools.<br>Score 80% or higher to pass.</p>
+    <div class="stats-strip">
+      <div class="stat-item">
+        <div class="stat-val">20</div>
+        <div class="stat-lbl">Questions</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val">80%</div>
+        <div class="stat-lbl">Pass Mark</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val">~10</div>
+        <div class="stat-lbl">Minutes</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Questions injected here -->
+  <div id="quizQuestions"></div>
+
+  <!-- Score Card -->
+  <div class="score-card" id="scoreCard"></div>
+
+</main>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// QUIZ DATA
+// ═══════════════════════════════════════════════════════════
+const QUESTIONS = [
+  {
+    cat: 'structure',
+    catLabel: 'Trend Structure',
+    q: 'Which of the following best defines a market trend?',
+    opts: [
+      'A single large candle moving in one direction',
+      'The general, sustained directional movement of price over time',
+      'Any price move that lasts more than 10 minutes',
+      'A pattern that only appears on daily charts'
+    ],
+    ans: 1,
+    fb: 'A trend is the overall directional bias across multiple price swings — not a single move or timeframe. It represents accumulated buying or selling pressure over time.'
+  },
+  {
+    cat: 'structure',
+    catLabel: 'Trend Structure',
+    q: 'In an uptrend, what two-part price pattern must repeat?',
+    opts: [
+      'Lower Highs and Lower Lows',
+      'Higher Highs and Higher Lows',
+      'Equal Highs and Higher Lows',
+      'Higher Highs and Equal Lows'
+    ],
+    ans: 1,
+    fb: 'HH + HL is the definition of an uptrend. Each rally reaches a new peak (Higher High) and each pullback holds above the prior pullback low (Higher Low) — the ascending staircase pattern.'
+  },
+  {
+    cat: 'structure',
+    catLabel: 'Trend Structure',
+    q: 'A stock\'s weekly chart shows an uptrend. Its daily chart shows a pullback. What is the pullback most accurately called?',
+    opts: [
+      'A trend reversal',
+      'A Change of Character',
+      'A secondary correction inside the primary uptrend',
+      'A downtrend override'
+    ],
+    ans: 2,
+    fb: 'Short-term moves against the higher-timeframe trend are corrections or pullbacks — not reversals until the higher-timeframe structure itself breaks. Always identify the primary trend first.'
+  },
+  {
+    cat: 'structure',
+    catLabel: 'Trend Structure',
+    q: 'In a downtrend, what does a "Lower High" tell you?',
+    opts: [
+      'Buyers are gaining strength',
+      'Each rally stalls at a lower level — sellers are stepping in earlier',
+      'Price is ranging between two levels',
+      'A reversal is confirmed'
+    ],
+    ans: 1,
+    fb: 'Lower Highs mean sellers are more aggressive — they step in at lower and lower prices on each bounce, preventing price from recovering to its prior peak. This is the defining signature of seller control.'
+  },
+  {
+    cat: 'structure',
+    catLabel: 'Trend Structure',
+    q: 'Which of these describes a sideways (ranging) market?',
+    opts: [
+      'Consistent Higher Highs and Higher Lows',
+      'Consistent Lower Highs and Lower Lows',
+      'Price oscillating between a horizontal resistance and a horizontal support',
+      'A flat moving average positioned below price'
+    ],
+    ans: 2,
+    fb: 'A ranging market has no directional bias — price bounces between a ceiling (resistance) and a floor (support) repeatedly without forming the HH/HL or LH/LL sequences needed to call a trend.'
+  },
+  {
+    cat: 'structure',
+    catLabel: 'Trend Structure',
+    q: 'A stock is in an uptrend. Price makes a new High, then pulls back — and the pullback low breaks below the previous Higher Low. What does this signal?',
+    opts: [
+      'The uptrend is confirmed and strengthening',
+      'The uptrend structure has been violated — increased caution is warranted',
+      'This is perfectly normal behavior in any uptrend',
+      'The stock is now in a confirmed downtrend by definition'
+    ],
+    ans: 1,
+    fb: 'When the first Higher Low fails and price breaks below it, the ascending staircase is cracking. The uptrend is no longer structurally confirmed. This does not guarantee a reversal, but it demands attention and reduced bullish bias.'
+  },
+  {
+    cat: 'trendline',
+    catLabel: 'Trendlines',
+    q: 'How many touch points are required at minimum to draw a valid trendline?',
+    opts: [
+      'One — just needs to connect to a starting point',
+      'Two — defines the line; a third touch confirms it',
+      'Four — institutional standard',
+      'Five — required for swing traders'
+    ],
+    ans: 1,
+    fb: 'Two points define the line. A third touch validates it as a significant level. The more times price touches a trendline and holds, the stronger and more meaningful that trendline becomes.'
+  },
+  {
+    cat: 'trendline',
+    catLabel: 'Trendlines',
+    q: 'A trendline drawn on an uptrending chart should connect which points?',
+    opts: [
+      'The swing highs (peaks) of the trend',
+      'The swing lows (troughs / Higher Lows) of the trend',
+      'The closing prices of each session only',
+      'The midpoints of each candlestick body'
+    ],
+    ans: 1,
+    fb: 'In an uptrend, connect the Higher Lows — the troughs of each pullback. This creates a rising support line that defines the lower boundary of the trend. On a downtrend, connect the Lower Highs instead.'
+  },
+  {
+    cat: 'trendline',
+    catLabel: 'Trendlines',
+    q: 'What does it mean when a trendline has a very steep angle (above 60°)?',
+    opts: [
+      'It is the most reliable and durable type of trendline',
+      'It signals institutional accumulation is occurring',
+      'Steep trendlines tend to break more quickly; shallower, gradual trendlines are more durable',
+      'Steep trendlines only occur in downtrends'
+    ],
+    ans: 2,
+    fb: 'Very steep trendlines reflect near-vertical price moves — unsustainable by nature. They tend to break faster than gradual, shallow trendlines. The most durable trends move at moderate, steady angles.'
+  },
+  {
+    cat: 'trendline',
+    catLabel: 'Trendlines',
+    q: 'Which of the following best describes a "pullback" inside an uptrend?',
+    opts: [
+      'A reversal of the entire uptrend',
+      'A short-term move downward that forms a Higher Low before resuming upward',
+      'A break of the trendline followed by new highs',
+      'A gap down in price on unusually high volume'
+    ],
+    ans: 1,
+    fb: 'A pullback is a temporary, low-conviction dip against the uptrend. It ends when a Higher Low forms and buying resumes. Pullbacks are normal, healthy behavior — and in uptrends, they are often the best buying opportunities.'
+  },
+  {
+    cat: 'trendline',
+    catLabel: 'Trendlines',
+    q: 'A trader draws a trendline that cuts through multiple candle bodies in order to connect the points. What is the correct assessment?',
+    opts: [
+      'This is acceptable — bodies and wicks are interchangeable',
+      'The trendline is not valid; it should be redrawn using only wick extremes',
+      'Cutting through bodies makes the trendline stronger',
+      'This only matters on intraday charts'
+    ],
+    ans: 1,
+    fb: 'A valid trendline should not cut through candle bodies. Bodies represent the open-to-close range — the core of the session\'s price action. Wicks are acceptable to pierce, but if the line passes through bodies, the connection is being forced.'
+  },
+  {
+    cat: 'warning',
+    catLabel: 'Warning Signs',
+    q: 'Which of the following is NOT a warning sign that an uptrend is weakening?',
+    opts: [
+      'Price fails to make a new Higher High',
+      'A Higher Low holds firmly above the prior pullback low',
+      'Price closes convincingly below the rising trendline',
+      'RSI shows bearish divergence on the latest rally'
+    ],
+    ans: 1,
+    fb: 'A Higher Low holding is a sign the uptrend is INTACT — not a warning against it. It confirms buyers are still stepping in above the prior pullback, which is exactly what a healthy uptrend does.'
+  },
+  {
+    cat: 'warning',
+    catLabel: 'Warning Signs',
+    q: 'Why is it important to see multiple warning signals before concluding a trend has reversed?',
+    opts: [
+      'One failed swing is always enough to exit immediately',
+      'Single signals are often noise — waiting for multiple aligned signals reduces false exits from healthy trends',
+      'Multiple signals mean the trend has already fully reversed',
+      'Only moving average crossovers count as reversal signals'
+    ],
+    ans: 1,
+    fb: 'A single warning sign is a flag to pay attention — not an action trigger. Healthy trends have temporary setbacks that can look like reversal signals but are not. Requiring confluence of multiple signals protects you from being shaken out prematurely.'
+  },
+  {
+    cat: 'warning',
+    catLabel: 'Warning Signs',
+    q: 'Why do trend-following strategies fail inside a ranging market?',
+    opts: [
+      'Because ranges only occur on intraday charts',
+      'Because trend-following relies on directional momentum that does not exist in a range — entries immediately reverse',
+      'Because volume is always too high in ranging markets',
+      'Because moving averages cannot be plotted during a range'
+    ],
+    ans: 1,
+    fb: 'Trend-following needs sustained directional momentum to work. In a range, price has no consistent bias — so trend signals fire in both directions repeatedly, generating a series of small losses that erode capital quickly.'
+  },
+  {
+    cat: 'confirm',
+    catLabel: 'Confirmation',
+    q: 'What does a "Golden Cross" on a chart indicate?',
+    opts: [
+      'The 50 MA crossing below the 200 MA — a bearish signal',
+      'The 200 MA crossing above the 50 MA — a neutral signal',
+      'The 50 MA crossing above the 200 MA — a long-term bullish signal',
+      'Price crossing above the 50 MA — a short-term buy signal'
+    ],
+    ans: 2,
+    fb: 'A Golden Cross is the 50-period MA crossing above the 200-period MA — a widely followed long-term bullish signal indicating the medium-term trend has risen above the long-term trend. The opposite (50 below 200) is called a Death Cross.'
+  },
+  {
+    cat: 'confirm',
+    catLabel: 'Confirmation',
+    q: 'In an uptrend, what volume pattern is considered healthy and confirms the trend?',
+    opts: [
+      'Volume expands on pullbacks and contracts on rallies',
+      'Volume is flat and uniform throughout',
+      'Volume expands on rally days and contracts on pullback days',
+      'Volume only matters in downtrends'
+    ],
+    ans: 2,
+    fb: 'Healthy uptrend volume: strong buying pressure (high volume) on rally days, low selling pressure (low volume) on pullbacks. This pattern shows real institutional participation on the upside and a lack of conviction on the dips.'
+  },
+  {
+    cat: 'confirm',
+    catLabel: 'Confirmation',
+    q: 'What is "bearish divergence" in the context of RSI and trend analysis?',
+    opts: [
+      'RSI is above 70 while price is falling sharply',
+      'Price makes a Higher High but RSI makes a Lower High at the same time',
+      'Price and RSI are both declining together in a downtrend',
+      'RSI crosses below the 50 level'
+    ],
+    ans: 1,
+    fb: 'Bearish divergence: price climbs to a new high but RSI does not confirm the move — it makes a lower high. The engine (momentum) is losing power even as price rises. This is one of the most reliable early warning signals of an uptrend nearing exhaustion.'
+  },
+  {
+    cat: 'confirm',
+    catLabel: 'Confirmation',
+    q: 'What is the primary benefit of checking the higher-timeframe trend before trading a lower timeframe?',
+    opts: [
+      'It removes the need for any other analysis tool',
+      'It lets you use larger position sizes safely',
+      'It ensures you are trading in the direction of the dominant bias — giving setups a structural edge',
+      'It guarantees profits on every trade'
+    ],
+    ans: 2,
+    fb: 'The higher timeframe trend acts as a directional filter. Trading in the direction of the primary trend means market structure is working with you, not against you. This does not guarantee success but raises the probability of any individual setup.'
+  },
+  {
+    cat: 'confirm',
+    catLabel: 'Confirmation',
+    q: 'You see a chart where: the 50-day MA is below and declining away from the 200-day MA, and price is below both MAs. What does this suggest?',
+    opts: [
+      'A bullish trend is developing — price is building a base',
+      'The market is in a confirmed long-term bearish configuration',
+      'The chart is completely neutral with no directional information',
+      'A Golden Cross is forming'
+    ],
+    ans: 1,
+    fb: 'A declining 50 MA below a declining 200 MA, with price below both, is a textbook long-term bearish setup. All three elements agree: structure, momentum, and the moving average hierarchy all point lower.'
+  },
+  {
+    cat: 'confirm',
+    catLabel: 'Confirmation',
+    q: 'A trader identifies an uptrend on the daily chart with a confirmed HH/HL pattern, a valid 3-touch trendline, price above a rising 50 MA, and expanding volume on rally days. How would you assess this analysis?',
+    opts: [
+      'Incomplete — more timeframes are always needed before any conclusion',
+      'High-confidence — multiple independent tools all confirm the same bullish trend bias',
+      'Overanalyzed — price structure alone is always sufficient',
+      'Invalid — five touch points are required before a trendline is usable'
+    ],
+    ans: 1,
+    fb: 'This is a strong, multi-tool confluence: price structure, a well-tested trendline, moving average confirmation, and volume all point in the same direction. The more independent signals that agree, the higher the confidence in the trend read.'
+  }
+];
+
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+let answers   = {};
+let submitted = {};
+
+// ═══════════════════════════════════════════════════════════
+// BUILD
+// ═══════════════════════════════════════════════════════════
+function buildQuiz() {
+  const container = document.getElementById('quizQuestions');
+  container.innerHTML = QUESTIONS.map((q, qi) => `
+    <div class="question-card ${qi === 0 ? 'active' : ''}" id="q${qi}">
+      <div class="q-meta">
+        <div class="q-num">Question ${qi + 1} of ${QUESTIONS.length}</div>
+        <div class="q-category ${q.cat}">${q.catLabel}</div>
+      </div>
+      <div class="q-text">${q.q}</div>
+      <div class="q-options">
+        ${q.opts.map((o, oi) => `
+          <div class="q-option" id="qo${qi}_${oi}" onclick="selectOpt(${qi}, ${oi})">
+            <span class="q-letter">${String.fromCharCode(65 + oi)}.</span>
+            <span>${o}</span>
+          </div>
+        `).join('')}
+      </div>
+      <div class="q-feedback" id="qfb${qi}"></div>
+      <div class="quiz-nav">
+        <button class="btn-next" id="qnext${qi}" onclick="nextQ(${qi})">
+          ${qi === QUESTIONS.length - 1 ? 'See Results →' : 'Next Question →'}
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// INTERACTION
+// ═══════════════════════════════════════════════════════════
+function selectOpt(qi, oi) {
+  if (submitted[qi]) return;
+  submitted[qi] = true;
+  answers[qi]   = oi;
+
+  const q = QUESTIONS[qi];
+  const correct = oi === q.ans;
+
+  for (let i = 0; i < q.opts.length; i++) {
+    const el = document.getElementById(`qo${qi}_${i}`);
+    el.classList.add('disabled');
+    if (i === q.ans)                  el.classList.add('correct');
+    else if (i === oi && !correct)    el.classList.add('wrong');
+    else                              el.style.opacity = '0.35';
+  }
+
+  const fb = document.getElementById('qfb' + qi);
+  fb.className = 'q-feedback show ' + (correct ? 'correct-fb' : 'wrong-fb');
+  fb.innerHTML = `<strong>${correct ? '✓ Correct' : '✗ Incorrect'}</strong>${q.fb}`;
+
+  document.getElementById('qnext' + qi).classList.add('show');
+
+  // Update progress bar
+  const answered = Object.keys(submitted).length;
+  document.getElementById('mainProgress').style.width = (answered / QUESTIONS.length * 100) + '%';
+  document.getElementById('qCounter').textContent = Math.min(answered + 1, QUESTIONS.length);
+}
+
+function nextQ(qi) {
+  document.getElementById('q' + qi).classList.remove('active');
+  if (qi < QUESTIONS.length - 1) {
+    document.getElementById('q' + (qi + 1)).classList.add('active');
+    document.getElementById('qCounter').textContent = qi + 2;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } else {
+    showResults();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// RESULTS
+// ═══════════════════════════════════════════════════════════
+function showResults() {
+  document.querySelectorAll('.question-card').forEach(c => c.style.display = 'none');
+
+  let correct = 0;
+  QUESTIONS.forEach((q, qi) => { if (answers[qi] === q.ans) correct++; });
+  const wrong = QUESTIONS.length - correct;
+  const pct   = Math.round((correct / QUESTIONS.length) * 100);
+  const pass  = pct >= 80;
+
+  const circumference = 2 * Math.PI * 56;
+  const offset = circumference - (pct / 100) * circumference;
+  const ringColor = pct >= 80 ? '#22c55e' : pct >= 60 ? '#f0c040' : '#ef4444';
+  const title = pct >= 80 ? 'Well Done! 🎓' : pct >= 60 ? 'Good Effort — Keep Studying' : 'Keep Practicing — You\'ll Get There';
+
+  // Build per-question result rows
+  const detailRows = QUESTIONS.map((q, qi) => {
+    const ok = answers[qi] === q.ans;
+    return `
+      <div class="score-detail-row">
+        <div class="sdr-num">Q${qi + 1}</div>
+        <div class="sdr-text">${q.q.length > 65 ? q.q.slice(0, 65) + '…' : q.q}</div>
+        <div class="sdr-result ${ok ? 'ok' : 'no'}">${ok ? '✓ CORRECT' : '✗ WRONG'}</div>
+      </div>
+    `;
+  }).join('');
+
+  const sc = document.getElementById('scoreCard');
+  sc.innerHTML = `
+    <div class="score-ring">
+      <svg viewBox="0 0 128 128">
+        <circle cx="64" cy="64" r="56" fill="none" stroke="var(--border)" stroke-width="8"/>
+        <circle cx="64" cy="64" r="56" fill="none" stroke="${ringColor}" stroke-width="8"
+          stroke-dasharray="${circumference}" stroke-dashoffset="${circumference}"
+          stroke-linecap="round" transform="rotate(-90 64 64)"
+          id="ringCircle" style="transition: stroke-dashoffset 1.2s ease;"/>
+      </svg>
+      <div class="score-ring-inner">
+        <div class="score-ring-num">${pct}%</div>
+        <div class="score-ring-label">Score</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:1rem;">
+      ${pass
+        ? `<div class="pass-banner">✓ &nbsp;Passed — Trend Identification Assessment</div>`
+        : `<div class="fail-banner">✗ &nbsp;Score 80% or higher to pass — try again</div>`}
+    </div>
+
+    <h2 class="score-title">${title}</h2>
+    <p class="score-sub">${pass
+      ? 'You have demonstrated solid understanding of trend identification fundamentals.'
+      : 'Review the lessons, focus on the categories you missed, and retake the quiz.'}</p>
+
+    <div class="score-breakdown">
+      <div class="score-stat">
+        <div class="score-stat-val" style="color:var(--accent3);">${correct}</div>
+        <div class="score-stat-lbl">Correct</div>
+      </div>
+      <div class="score-stat">
+        <div class="score-stat-val" style="color:var(--danger);">${wrong}</div>
+        <div class="score-stat-lbl">Incorrect</div>
+      </div>
+      <div class="score-stat">
+        <div class="score-stat-val">${QUESTIONS.length}</div>
+        <div class="score-stat-lbl">Total</div>
+      </div>
+    </div>
+
+    <div class="score-detail">${detailRows}</div>
+
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn-primary" onclick="retakeQuiz()">↺ &nbsp;Retake Quiz</button>
+    </div>
+  `;
+  sc.classList.add('show');
+  document.getElementById('mainProgress').style.width = '100%';
+  document.getElementById('qCounter').textContent = QUESTIONS.length;
+
+  // Animate the ring after render
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      document.getElementById('ringCircle').style.strokeDashoffset = offset;
+    }, 100);
+  });
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ═══════════════════════════════════════════════════════════
+// RETAKE
+// ═══════════════════════════════════════════════════════════
+function retakeQuiz() {
+  answers = {}; submitted = {};
+  document.getElementById('scoreCard').classList.remove('show');
+  document.getElementById('scoreCard').innerHTML = '';
+  document.getElementById('mainProgress').style.width = '0%';
+  document.getElementById('qCounter').textContent = '1';
+  buildQuiz();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+buildQuiz();
+</script>
+</body>
+</html>
